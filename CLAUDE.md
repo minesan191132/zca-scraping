@@ -1,164 +1,73 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Hướng dẫn cho Claude Code (claude.ai/code) khi làm việc trong repo này.
 
-## What this project is
+## Dự án là gì
 
-Reads Zalo group/DM message history from **Zalo Desktop** (the Windows app, not
-chat.zalo.me) by attaching to it over the Chrome DevTools Protocol — scraping
-the DOM for message content, and (in watch mode) also observing Zalo Desktop's
-own WebSocket connection to its chat backend via CDP's `Network` domain purely
-as a fast, best-effort trigger for "something new arrived in thread X" (see
-`src/watch/realtimeListener.ts`). Read-only: no send/reply path, no separate
-login flow — it reuses whatever Zalo Desktop session is already logged in on
-the machine; the WS observation reuses that same session's connection rather
-than opening one of its own. See `README.md` for the full design rationale
-(why CDP instead of Playwright/`zca-js` web login) and detailed data-flow
-walkthrough — it's kept in sync with the code and is the source of truth for
-anything not covered below.
+**Báo Cáo Nhóm (Beta)**: đọc tin nhắn của các nhóm Zalo từ **Zalo Desktop** (app Windows, không phải chat.zalo.me) bằng cách gắn vào nó qua Chrome DevTools Protocol, cào DOM lấy nội dung, và (ở chế độ theo dõi) quan sát WebSocket của chính Zalo Desktop qua CDP `Network` như một tín hiệu nhanh, làm hết sức, cho biết "nhóm X có tin mới" (`src/watch/realtimeListener.ts`). Chỉ đọc: không có đường gửi tin, không có bước đăng nhập riêng, dùng lại phiên Zalo Desktop đã đăng nhập.
 
-## Bản Beta "Báo Cáo Nhóm" (đọc trước khi sửa)
+Đây là bản để phân phối cho người khác: lõi cào tin, một bộ điều phối mỏng, panel Electron và kiểm giấy phép. Nó **không** kèm báo cáo nghiệp vụ nào. Cây mã còn chứa mã của hệ thống báo cáo đầy đủ mà bản này được tách ra (các thư mục `chat/`, `total/`, `lesson/`, `reportSets/`, `leave/`, `minutes/`, `master/`, `vision/`, `ocr/`, `runner/` ngoài `dispatch.ts`); phần đó không thuộc bản bán và không được đóng vào gói. README là nguồn sự thật cho thiết kế và luồng dữ liệu.
 
-Repo này là bản bán. Phần lớn tài liệu dưới đây mô tả hệ thống đầy đủ của tác giả; bản bán chỉ có `bot:watch` (lõi), `bot:dispatch`, panel và giấy phép. Tổng quan, bảng khác biệt và lệnh dựng: README, mục "Bản Beta". Vận hành: `docs/van-hanh-ban-ban.md`. Định nghĩa báo cáo: `docs/dinh-nghia-bao-cao.md`.
-
-- Cấu hình bản bán là `config.json` ở `ZBOT_HOME`, nạp đè lên mặc định trong `config.ts` (`src/config/configFile.ts`). Mặc định KHÔNG chứa tên nhóm, người, trường hay đường dẫn riêng. Test đọc `tests/fixtures/config.test.json`, không đọc `config.json` thật.
-- `dist/` do `npm run build:dist` sinh, không sửa tay, không commit. `scripts/distCheck.mjs` phải qua.
-- KHÔNG đưa khóa riêng giấy phép vào repo, `dist/` hay gói cài. Nó nằm ngoài repo; chỉ `src/cli/issue-license.ts` đọc nó và file đó không nằm trong `dist`.
-- Tên, `appId`, thư mục dữ liệu đã chốt (`Báo Cáo Nhóm`, `com.baocaonhom.app`, `BaoCaoNhom`): không đổi.
-- Mọi tên trường, tên người, id bộ trong test và tài liệu là tên giả. Không thêm tên thật vào repo công khai này.
-
-## Commands
+## Lệnh
 
 ```bash
-npx tsx src/cli/bot-scrape.ts                              # manual scrape of the queued targets only (npm run bot:scrape); empty queue exits at once
-npm run bot:watch                              # long-running detector: appends targets with new messages to data/.scrape-events-<day>.jsonl (the scrape queue), never scrapes
-npm run zalo:debug                             # just relaunch Zalo Desktop with --remote-debugging-port open, then exit (for manual CDP probing)
-npx tsx src/cli/export-excel.ts <threadId> [senderName]   # export already-scraped thread to .xlsx (npm run export:excel -- <threadId> [senderName])
-npm run mcp                                    # start the read-only MCP server over stdio
-npm run typecheck                              # tsc --noEmit
-npm test                                       # unit tests for the lesson-report extractor (node:test)
-npm run extract:reports -- [--set <id>] [--day YYYY-MM-DD] [--buoi morningstart|morningend|afternoonstart|afternoonend] [--no-db]   # extract one PHASE's start/end-of-lesson reports -> output/<id>/{output,marks,review,meta}.json
-npm run fill:report -- output/output.json      # fill templates/Temp_RoomFacility_rpt.xlsm, run its macro -> data/export/baocaobuoi<phase>_<ddMMyy>.xlsm (needs Excel) -- RETIRED from bot:runner/runner:once (2026-09-29): template file missing from disk, and 4/5 of its tables (MAY TINH, INTERNET, NETSUPPORT, LOA) are superseded by fill:status-reports; still runnable by hand if the template is restored
-npm run fill:status-reports -- [output/<id>/output.json] [--set <id>] [--only <codes>]   # fill the status files from the new templates in data/mau bao cao new, in this order: NETSUPPORT, ÂM THANH (key `loa`, template "01 - FORM TINH TRANG AM THANH.xlsx"), INTERNET (NETSUPPORT and INTERNET share one 2-sheet template) and MÁY TÍNH; the order of the keys of `FILE_LAYOUT` is also the export and print order of the total report (NETSUPPORT, ÂM THANH, INTERNET, MÁY TÍNH, ĐIỆN, VỆ SINH, NỘI QUY) (ĐIỆN is NOT made here any more: see `fill:electric-report`), into <statusExportDir>/<yyMM>/<yyMMdd>/<id>/<title>_<yyMMdd>_T<thu>_<HHmm>.xlsx where the title is read from cell A1 of each template and HHmm is the time of the LATEST REPORT of that phase (`latestReportHhmm`: e.g. the latest report before 9:00 names the start-of-morning file; run time only when the phase has no report), so rebuilding without a new report gives the same name — and if another phase of the same set, day and title already uses that minute the next free minute is taken (`freeHhmm`), because the name has no phase in it and phases built back to back (e.g. `npm run today`) would otherwise overwrite each other; the previous file of the same phase is found via data/.status-report-files.json and deleted after the new one is written; there is no SỐ LẦN column any more; VỆ SINH and NỘI QUY are written by `fill:cleaning-report` / `fill:attendance-report` (run once per runner cycle) — see docs/superpowers/specs/2026-10-03-bo-mau-moi-7-file-design.md (needs Excel)
-npm run fill:electric-report -- [--set <id>] [--now <unix ms>] [--force]   # TÌNH TRẠNG ĐIỆN of TODAY from the WHOLE DAY of "LỖI ĐIỆN" messages (any group, any hour, latest per room; Trường/Khu vực default to the group name; Tình trạng T/B/K goes to XẾP LOẠI and sorts T,B,K, other text to HIỆN TRẠNG): ONE file per day, run once per runner cycle, rebuilt (new HHmm, old one replaced) only when the rows changed since the last build (data/.electric-report.<id>.json), otherwise it does nothing
-npm run fill:maintenance-report -- [--set <id>] [--now <unix ms>] [--dry-run]   # updates the MASTER file "THỜI GIAN CHƯA BẢO TRÌ PM" (in the set's day folder <statusExportDir>/<yyMM>/<yyMMdd>/<id>/; a new day copies the latest earlier master, the very first one is copied from data/mau bao cao new/07-…xlsx): cell BẢO TRÌ GN of the school's row = the date of its "CÔNG VIỆC CUỐI CA LÀM" message (the new IT form, parsed by `parseEndOfShift` in `src/lesson/cleaningReport.ts`; the old "BÁO CÁO CUỐI BUỔI" form is no longer read; row lookup tries `schoolKeys` in `src/master/masterKeys.ts`: name+Phân hiệu "CSn", name, name+" - khu vực", name+" - <area code>" when the area is in `src/lesson/schoolArea.ts` (message "THỦ ĐỨC" vs master "TĐ"), name without level prefix; the area itself is compared literally first, then through that code table — `areaKey` in `src/master/masterKeys.ts`, `findRow` in `masterMatch.ts`) (never goes back to an older date); the master file is named like the other reports, `THOI GIAN CHUA BAO TRI PM_<yyMMdd>_T<thu>_<HHmm>.xlsx` (the HHmm changes only when cells are written; the old fixed name without a suffix is still found and replaced, `findMaster` in `src/master/masterStore.ts`), a backup goes to data/sao-luu/<id>/<yyMMdd>/ (inside the project data folder, not the day folder; named without the `_T<thu>_<HHmm>` part) before every write, Excel patches a TEMP copy that then replaces the master (a locked/open master or an Excel error leaves it untouched and fails the step, retried next cycle); messages that match no row (or several) go to output/<id>/master-review.maintenance.json, never to a new row; nothing to change = no backup, no Excel; --dry-run lists the cells it would write (needs Excel) -- see docs/superpowers/specs/2026-10-09-bao-cao-vao-file-tong-design.md
-npm run fill:internet-speed-report -- [--set <id>] [--now <unix ms>] [--dry-run]   # same for the MASTER file "TRẠNG THÁI KẾT NỐI INTERNET" (named `TRANG THAI KET NOI INTERNET_<yyMMdd>_T<thu>_<HHmm>.xlsm`, same rule as above) (07/08 are matched by cấp+tên trường, khu vực and, for 08, the room): cells TỐC ĐỘ (from the text line "Tốc độ Internet" of the "CÔNG VIỆC CUỐI CA LÀM" message, no photo: a number with unit is converted to Mbps, blank or 0 is 0, words without a number such as "Không có mạng" write nothing; one message gives one row per room of "Phòng máy làm việc") and NGÀY CẬP NHẬT of the right (school, room) row; XẾP LOẠI is the file's own formula; master-review.internetSpeed.json for unmatched rooms (needs Excel)
-npm run fill:tech-reports -- [--set <id>] [--now <unix ms>] [--force]   # 4 báo cáo kỹ thuật của mẫu 05 - FORM EXCEL BAO CAO KY THUAT.xlsx (mã `attendanceStart` ĐIỂM DANH ĐẦU BUỔI đến 08:30, `attendanceEnd` ĐIỂM DANH CUỐI BUỔI đến 12:30, `shiftStart` CÔNG VIỆC ĐẦU CA LÀM đến 09:00, `shiftEnd` CÔNG VIỆC CUỐI CA LÀM đến 12:00; mốc ở `config.techReports`, chỉ tin gửi TRONG NGÀY, mỗi tin một dòng, chép nguyên văn) mà bộ `--set` bật, mỗi báo cáo một file `<tiêu đề>_<yyMMdd>_T<thứ>_<HHmm>.xlsx` trong thư mục của bộ, chỉ dựng lại khi các dòng đổi; bộ NguoiA giữ hai điểm danh, bộ NguoiC (`reporterName` "Chưa phân công") giữ hai công việc ca; `bot:runner` gọi mỗi chu trình, KHÔNG vào `-auto` của `bot:total` (`MASTER_REPORTS`); design: docs/superpowers/specs/2026-10-22-4-bao-cao-ky-thuat-moi-design.md (needs Excel)
-npm run mark:messages -- output/<id>/marks.json     # set StatusId/HasRead on Zalo_CrawlMessage rows
-npm run sync:db -- [--apply]                   # push data/<groupId>.json into Zalo_CrawlMessage; dry run unless --apply (the runner cycle calls it with --apply)
-npm run photos:bundle -- [--day YYYY-MM-DD] [--from-dir <dir>]   # bundle the photos of config.vision.leave.groups into data/photo-reports/<day>/...; reads nothing, safe to repeat
-npm run photos:ocr -- --bundle <id> [--day D]   # print the local OCR text, size, kind and score of each photo in one bundle; no agent call, no cost
-npm run photos:read -- [--day D] [--bundle <id>] [--again] [--dry-run]   # agent reads closed bundles not yet read (OpenRouter, costs quota, at most vision.maxBundlesPerRun); `photos:auto` is the runner's version
-npm run photos:review -- [--list] [--bundle <id> [--row N --confirm|--discard|--fix col=VALUE]]   # human review of leave rows (and minutes with --minutes) the agent was unsure about
-npm run photos:golden -- [--rule leave] [--case <name>]   # score the agent on photo-golden/<rule>.json; spends quota, manual only, not in npm test
-npm run fill:leave-report -- [--set <id>] [--now <unix ms>] [--force]   # LỊCH NGHỈ PHÉP of today from the read leave photos; one file per day, rebuilt only when its cells changed (runner runs it after photos:auto)
-npm run fill:minutes-report -- [--set <id>] [--now <unix ms>] [--force]   # QUẢN LÝ BIÊN BẢN of today from the minutes photos that come with a CÔNG VIỆC CUỐI CA LÀM message; one file per day, rebuilt only when its rows changed
-npm run leave:show -- [--day YYYY-MM-DD]       # print what the leave report would fill for a day (read-only, no Excel, no agent)
-npm run export:lesson-report -- output/output.json   # one-sheet export of an output.json to data/export/lesson-report-<day>.xlsx
-npm run watch:status                           # is bot:watch alive? when did it last beat, which sources are up, recent gaps
-npm run bot:runner                             # long-running orchestrator: queue has groups + quiet for runner.quietSeconds (30 s in config.ts, 120 s default) -> scrape, sync DB, extract, refresh the session's Excel
-npm run runner:status                          # is bot:runner alive? last cycle (with step and per-group timings), queue, sessions still owing a rebuild (exit 2 when not alive)
-npm run runner:timing -- [--last N]            # cycle and per-group scrape time statistics from output/runner-log.jsonl (avg, p95, max)
-npm run runner:once -- [--set <id>] [--day D] [--buoi morningstart|morningend|afternoonstart|afternoonend]    # rebuild ONE session's outputs without scraping (after editing output/<id>/overrides.json) -- also auto-runs fill:status-reports
-npm run bot:chat                               # auto-reply from chat-rules.json: reads data/.chat-inbox.jsonl (written by bot:watch), sends via Zalo Desktop's UI
-npm run chat:status                            # is bot:chat alive? dry-run or live, groups, pending inbox (exit 2 when not alive)
-npm run bot:total                              # long-running scheduler for the TOTAL reports: at 9:00 (messages 6:30-9:00) and 15:00 (messages 6:30-15:00) it writes the 7 status files with "-auto" appended to the name (waits up to 10 minutes for bot:runner to drain the queue, re-exports while the first export was incomplete); never scrapes, never takes data/.scrape.lock
-npm run total:once -- --slot morning|afternoon [--set <id>[,<id>...]] [--day D] [--now <unix ms>] [--print [--dry-run]]   # write one slot's 7 "-auto" files right now (no waiting) and record the slot so bot:total does not repeat it; --print also prints them on the Windows default printer (--dry-run only lists what would print)
-npm run total:status                           # is bot:total alive, and what happened to today's two slots (exit 2 when not alive)
-npm run config:show                            # print every tunable in config.ts by section (value, unit, default, which bot reads it); values that differ from the default are marked *
-npm run config:dump                            # print every tunable and its documentation as JSON after an @@JSON@@ marker (read-only; the Electron operations panel builds its settings form from it)
-npm run license:issue -- --customer "<tên>" --machine <MachineGuid> --days 90 --key <khóa riêng PEM> --out <file>   # CHỈ tác giả: cấp file giấy phép Ed25519 (src/core/license.ts) cho bản gộp; khóa riêng để ngoài repo, lệnh này không có trong dist; bản gộp (cờ ZBOT_BUNDLED đặt lúc dựng) từ chối bot-watch-core/bot-dispatch/bot-scrape khi giấy phép thiếu, hết hạn hay sai máy (thoát mã 3)
-npm run reports:list                           # the valid report codes for config.reportSets[].reports: kind, source title, Excel template and whether the template exists on this machine
-npm run scrape:add -- "Group name" [...]         # put group(s) from config.targets into the scrape queue by hand (a new group that was never scraped, or a forced re-scrape)
-npm run today -- [--set <id>[,<id>...]] [--no-db] [--dry-run]   # ONE command for the whole of today: scrape every group (except chat-only ones) back to 17:30 the evening before, sync the DB, then rebuild ALL of today's phases for each report set plus VỆ SINH, NỘI QUY, ĐIỆN, using the runner's own cycle (`runCycle`) with the scrape-all step and today's reports forced to "not built"; holds data/.scrape.lock (exit 2 if a cycle or scrape is running); does NOT make the total report (use `total:once`); --dry-run only lists what it would do
-npm run recover:missing -- [--day D] [--buoi B] [--dry-run]   # only if bot:watch had a gap: re-scrape just the groups missing a report, list what was missed (the sáng window starts at 17:30 the evening before, `recoveryWindow`, because reports sent after 17:30 belong to the next morningstart; the runner's own scrape (`scrapeSinceTs`) reaches back to the same time)
+npm install
+npm run typecheck                          # tsc --noEmit
+npm test                                   # unit test (node:test, tests/<tên>.test.ts)
+npm run build:dist                         # gộp CLI vào dist/ bằng esbuild và kiểm (scripts/distCheck.mjs)
+npx tsx src/cli/bot-watch-core.ts          # bot theo dõi (lõi): chỉ xếp nhóm có tin mới vào hàng chờ
+npx tsx src/cli/bot-dispatch.ts            # bộ điều phối cào mỏng: cào đúng các nhóm trong hàng chờ
+npm run bot:scrape                         # cào tay đúng các nhóm trong hàng chờ; hàng chờ rỗng thì thoát ngay
+npm run scrape:add -- "Tên nhóm"           # xếp một nhóm trong config.targets vào hàng chờ
+npm run watch:status                       # bot theo dõi còn sống không (thoát mã 2 khi không sống)
+npm run zalo:debug                         # chỉ mở Zalo Desktop kèm cổng debug rồi thoát, để dò CDP tay
+npm run config:show                        # in mọi thông số theo mục, kèm mặc định
+npm run config:dump                        # như trên nhưng JSON sau dấu @@JSON@@ (panel dựng form từ đây)
+npm run export:excel -- <groupId> [senderName]   # xuất tin đã cào của một nhóm ra .xlsx
+npm run mcp                                # MCP server chỉ-đọc qua stdio
+npm run license:issue -- --customer "<tên>" --machine <MachineGuid> --days 90 --key <khóa riêng PEM> --out <file>   # CHỈ máy người bán: cấp file giấy phép Ed25519 (không nằm trong dist)
+cd panel && npm run lint && npm run typecheck && npm test      # panel có eslint, vitest riêng
+cd panel && npm run build:product:unpack   # thử gói bán, không cài
+cd panel && npm run build:product          # file cài NSIS + latest.yml
 ```
 
-The only tests are the unit tests under tests/ (`npm test`, `node:test`, one `tests/<name>.test.ts` per module: lesson, runner, chat, total, master, leave, vision, config, scrape queue and more); there is no lint script for the bot (`panel/` has its own eslint and vitest). `curl http://127.0.0.1:9222/json/version`
-checks whether the CDP debug port is currently open (should return JSON, not
-connection-refused).
+`curl http://127.0.0.1:9222/json/version` kiểm cổng debug CDP đang mở (phải trả JSON, không phải connection refused).
 
-**`bot:watch` and `bot:scrape` cooperate through a queue, not by running the same UI code.**
-`bot:watch` only appends one line per message to `data/.scrape-events-<day>.jsonl` (see
-`src/scrape/scrapeQueue.ts`: append-only, no shared read-modify-write file, so watch and runner cannot overwrite each other); `bot:scrape` (`src/cli/bot-scrape.ts`, manual) and the runner take a snapshot of the
-queue (its groups plus how many bytes of each event file were read), scrape exactly those targets, then append a record to `.scrape-events.handled.jsonl`
-(`src/scrape/queueRun.ts`) — a target queued mid-scrape sits after that mark and stays; a target whose scrape failed stays queued and is retried up to `runner.maxScrapeAttempts` times. `bot:watch` never scrapes or clicks in Zalo Desktop's UI, so running both at once is safe; it only closes and reopens Zalo (holding `data/.scrape.lock`) when it reconnects or when the debug port stops answering (`watch.probeSeconds`). See README "Hàng chờ
-giữa `bot:watch` và `bot:scrape`".
+Tài liệu: `README.md` (thiết kế, cấu hình, bảo trì), `docs/huong-dan-khach-hang.md`, `docs/van-hanh-ban-ban.md` (cấp giấy phép, phát hành, sao lưu khóa), `docs/dinh-nghia-bao-cao.md` (engine định nghĩa báo cáo).
 
-**`bot:runner` is the third process** (`src/runner/`, `src/cli/bot-runner.ts`): it reads the queue, waits until it has been quiet for `runner.quietSeconds` (30 s in the current config.ts, 120 s default in `config:show`) (10 minutes at most from the first group), then runs a cycle (`src/runner/cycle.ts`): recover a `bot:watch` gap, scrape the queue, sync the DB, and for every session that got a new start/end report extract, run `fill:status-reports` (a failing report file there is a warning, recorded in `data/.runner-failed.json` and retried alone, not a build failure) and mark the messages. The old `.xlsm`-via-temp-file build (`fill:report`, `src/runner/safeReplace.ts`) is RETIRED from this pipeline as of 2026-09-29 (see the `fill:report` line above) — `BuildResult.excel` is always `null` now. Everything that drives Zalo Desktop's UI (`bot:runner`, manual `bot:scrape`, `bot:chat`, `recover:missing`, `runner:once`, `today`, and `bot:watch` while it reconnects) holds `data/.scrape.lock` (`src/core/scrapeLock.ts`). Which sessions to build is derived from `data/.runner-built.json` (keys of reports already built): a report on disk that is not in it makes its session dirty, so a crash mid-cycle or a manual scrape loses nothing. "Session" here is a `Phase` (`morningstart|morningend|afternoonstart|afternoonend` — `src/runner/affectedSessions.ts`, `classifyPhase`), not the older sáng/chiều/tối `Buoi` still used by the gap-recovery path (`recover:missing`, `watch:status`, `src/lesson/recovery.ts`) — the two haven't been unified yet. The runner never restarts `bot:watch`; like `bot:scrape`, a scrape relaunches Zalo Desktop if its debug port is closed, so the runner does nothing while `bot:watch` is still starting. Design: `docs/superpowers/specs/2026-09-25-bot-runner-design.md`, `docs/superpowers/specs/2026-09-29-giai-doan-4-phan-design.md`.
+## Bot theo dõi và bot cào phối hợp qua hàng chờ
 
-**`bot:chat` is the fourth process** (`src/chat/`, `src/cli/bot-chat.ts`): `bot:watch` stays the only listener (only it holds the WS cipher key) and splits each message into two independent lanes via `src/chat/fanout.ts`: the scrape queue (for `bot:runner`) and the chat inbox `data/.chat-inbox.jsonl` (for `bot:chat`; only text messages of the groups named in `chat-rules.json`, never the account's own). `bot:chat` reads the inbox, matches `chat-rules.json` (`src/chat/match.ts`; `mayLoi` is derived from the report parser, not a keyword, so "Tổng số máy bị lỗi: 0" never matches), limits rate (`src/chat/limits.ts`) and sends through the UI (`src/chat/send.ts`: before every keystroke it re-checks that both the selected sidebar title and the composer placeholder name the target group). A rule's `mention` list makes it tag people first (type `@` and then the whole name so the list narrows, find the exact name in Zalo's `#mentionPopover` (else delete the typed name and use the full list), arrow-key to it, Enter, check a real tag element exists); it never tags everyone (`src/chat/mentions.ts` `isEveryone`) and sends nothing when a tag fails. Sent replies are written to `data/.chat-sent.json` BEFORE sending so `bot:watch` drops their echo from both lanes. Sending holds `data/.scrape.lock`. Design: `docs/superpowers/specs/2026-09-25-bot-chat-design.md`. A group marked `"scrape": false` in `chat-rules.json` is chat-only: `routeMessage` still feeds its text to the inbox but never queues it for scraping (`noScrapeGroups`; also skipped in the notification path of `src/watch/watch.ts`), and `recoveryIgnoreWith` (src/chat/rules.ts) adds it to the recovery ignore list.
+Bot theo dõi chỉ nối một dòng cho mỗi tin vào `data/.scrape-events-<ngày>.jsonl` (`src/scrape/scrapeQueue.ts`: chỉ nối thêm, không đọc-sửa-ghi, nên theo dõi và cào không ghi đè nhau). Bộ điều phối (`src/runner/dispatch.ts`) hoặc `bot:scrape` chụp hàng chờ (các nhóm cùng số byte đã đọc của mỗi file), cào đúng các nhóm đó rồi nối một bản ghi vào `.scrape-events.handled.jsonl` (`src/scrape/queueRun.ts`). Nhóm xếp vào giữa lúc cào nằm sau mốc nên vẫn còn. Nhóm cào lỗi ở lại, thử lại tối đa `runner.maxScrapeAttempts` lần. Bot theo dõi không bao giờ cào hay bấm trong giao diện Zalo; nó chỉ tắt và mở lại Zalo (giữ `data/.scrape.lock`) khi nối lại hoặc khi cổng debug không trả lời. Mọi thứ điều khiển giao diện Zalo dùng chung khóa `data/.scrape.lock` (`src/core/scrapeLock.ts`).
 
-**`bot:total` is the fifth process** (`src/total/`, `src/cli/bot-total.ts`): at 9:00 and 15:00 (`config.total`) it exports the status files (7 report types for a set that enables them all, once per report set) of the day to `data/export/trang-thai/<yyMM>/<yyMMdd>/<id>/<title>_<yyMMdd>_T<thu>_<HHmm>-auto.xlsx`, from the local message store, over the messages sent from `windowStartHour` (6:30) up to the slot hour, one report per room (the latest one that has a grade; a later all-blank report such as "Học tại lớp" does not erase an earlier graded one). It runs in parallel with `bot:runner` without touching it: it reads `data/.runner-state.json` and the scrape queue only to decide whether to wait (at most `waitMaxMinutes`; a dead runner is not waited for), keeps its own `data/.total-state.json`, `data/.total-slots.json` and `data/.total-report-files.json`, and never takes `data/.scrape.lock`, uses `output/output.json` or marks messages. A slot that was exported while the queue was not empty is exported again every `refreshEveryMinutes` (or as soon as the queue is empty) until `refreshUntilMinutes`, replacing only that slot's "-auto" files. Printing (config section 11 `print`, off by default; `src/total/printFiles.ts`, `scripts/print-xlsx.ps1`): after the FIRST successful export of a slot it sends EVERY exported file, including those with no data rows (main sheet only, at most `print.maxPagesPerFile` pages each) to the Windows default printer through Excel `PrintOut`, margins and orientation come from the templates; it only ever reports "print command sent", never "printed". A print error is a warning, never a failed slot. `config.print.sets` (default `[]` = every set) limits automatic printing to the listed report sets (e.g. `["NguoiA"]`); `total:once --print` is never limited. The `maintenance` and `internetSpeed` reports are NOT total files any more (`MASTER_REPORTS` in `runTotal.ts`): they update the master files above, so they are neither exported as `-auto` nor printed nor counted in `expected`. `leave` and `minutes` are in `MASTER_REPORTS` too (since 2026-10-21), and so are the 4 technical-sheet codes (`attendanceStart`, `attendanceEnd`, `shiftStart`, `shiftEnd`; since 2026-10-22, `fill:tech-reports` builds them in `bot:runner` only): `bot:total` neither reads their data nor exports/prints them; `bot:runner` still builds those two files every cycle. Design: `docs/superpowers/specs/2026-10-02-bao-cao-tong-auto-design.md`.
+## Cấu hình
 
-**Photo reading (`src/vision/`, `photos:auto` in each runner cycle)**: only photos from `config.vision.leave.groups` are bundled (same sender, gap <= `vision.bundle.gapMinutes`, same-sender text within `textWindowMinutes` attached) and read by an agent for the leave and minutes (biên bản) rules. A local OCR prefilter drops images that belong to no enabled rule. A bundle whose attached text is ĐIỂM DANH ĐẦU/CUỐI BUỔI or CÔNG VIỆC ĐẦU CA LÀM (`suspectBundle.ts`) is always OCR'd and skipped without calling the agent when OCR finds no leave/minutes/uncertain image; a CÔNG VIỆC CUỐI CA LÀM text in the bundle exempts it (minutes photos come with that text). Skipped bundles do not count toward `maxBundlesPerRun` and are recorded as `prefilter.skipped` in `reading.json`; `photos:read --bundle <id>` or `--again` bypasses the skip.
+- Mặc định ở `config.ts`, KHÔNG chứa tên nhóm, người, trường hay đường dẫn riêng. Cấu hình thật ở `config.json` trong `ZBOT_HOME` (mặc định thư mục gốc repo; bản cài là `%LOCALAPPDATA%\BaoCaoNhom`), nạp đè lên mặc định lúc khởi động (`src/config/configFile.ts`). Mẫu: `config.example.json`.
+- `src/config/configCheck.ts` từ chối giá trị sai bằng một dòng `[config] ...` và thoát mã 1; `targets` rỗng chỉ là cảnh báo. `src/config/configDoc.ts` mô tả từng khóa.
+- Test không đọc `config.json` thật: chúng đọc `tests/fixtures/config.test.json` (qua `NODE_TEST_CONTEXT`).
+- Bot đọc cấu hình lúc khởi động; đổi xong phải khởi động lại bot.
+- Đường dẫn lấy từ `src/core/paths.ts` (`ZBOT_HOME` cho dữ liệu và cấu hình, `ZBOT_CODE_ROOT` cho mã). Chỉ file đó được đọc `import.meta.url`.
 
-**Report sets (`config.reportSets`, `src/reportSets/`)**: every report belongs to a PERSON, not to a Zalo group. A set is `{ id, reports }`: `id` is the person's folder (`<statusExportDir>/<yyMM>/<yyMMdd>/<id>/`, created by the bot), `reports` are internal codes (`netsupport`, `loa`, `internet`, `mayTinh`, `dien`, `cleaning`, `attendance`, plus `leave`, `maintenance`, `internetSpeed`, `minutes` and the 4 technical-sheet codes `attendanceStart`, `attendanceEnd`, `shiftStart`, `shiftEnd`; see `npm run reports:list`; the optional `reporterName` is printed in cell A2 of the technical sheets), with no default. All messages from every group in `config.targets` go through every set, and a code may be in several sets. `resolveReportSets` never throws: a wrong set or entry is disabled and reported loudly (startup screen of `bot:runner`/`bot:total`, `runner:status`, `total:status` (exit 2), `config:show`, cycle summary) while the others keep running. Isolation unit = (set, code): `bot:runner` loops sets, each set works in `output/<id>/` (own `output.json`, `marks.json`, `review*.json`, `meta.json`, `overrides.json`), a failed report file is written to `data/.runner-failed.json` and retried alone (every `runner.dirtyRetrySeconds`, forgotten when the day ends), built state is `{ "<id>": [...] }` in `data/.runner-built.json` (the old array is handed to the current sets; a new set starts from a baseline so it does not rebuild history), the file tracker and the electric state (`data/.electric-report.<id>.json`) are per set, and the marks (`StatusId`) of all sets are merged (needs-review > done > ignored) and written once per cycle (marks that could not be written stay in `data/.runner-marks-pending.json` for the next cycle). `bot:total` writes each set's `-auto` files into its folder. Old `output/overrides.json` must be copied by hand into `output/<id>/overrides.json` (the runner warns). Adding a NEW report type needs code (registry entry, parser, layout, tests); see `.claude/skills/cau-hinh-nguoi-phu-trach/SKILL.md`. Design: `docs/superpowers/specs/2026-10-06-bo-bao-cao-theo-nguoi-design.md`.
+## Bản bán: những điều không được phá
 
-## Rules (`.claude/RULES/`)
+- **Khóa riêng giấy phép không bao giờ vào repo, `dist/` hay gói cài.** Nó nằm ngoài repo; chỉ `src/cli/issue-license.ts` đọc nó và file đó không thuộc `dist`. `scripts/distCheck.mjs` quét `dist/` tìm khóa riêng; `.gitignore` chặn `*.pem`, `license-private*`, `/license.json`, `/config.json`.
+- Bot điều khiển Zalo (`bot-watch-core`, `bot-dispatch`, `bot-scrape`) gọi `requireLicense()` (`src/core/licenseGate.ts`); khi dựng, esbuild thay `process.env.ZBOT_BUNDLED` bằng `"1"` nên bản đã gộp thoát mã 3 nếu giấy phép không hợp lệ. Chạy từ mã nguồn thì không bị chặn.
+- `appId` `com.baocaonhom.app`, tên file chạy `bao-cao-nhom`, thư mục dữ liệu `BaoCaoNhom`, tên sản phẩm "Báo Cáo Nhóm" và kho phát hành `minesan191132/zca-scraping` đã nằm trong gói khách: không đổi.
+- Không chạy `bot:watch` hay bot khác của hệ thống đầy đủ cùng lúc với bản cài trên một máy: cả hai cùng điều khiển một Zalo Desktop qua cổng 9222.
+- Đây là repo công khai. Mọi tên trường, tên người, id bộ trong test và tài liệu là **tên giả**. Không thêm tên thật, đường dẫn máy thật, khóa hay dữ liệu cào được.
 
-Mandatory working rules (index: `.claude/RULES/README.md`). Rule 4 is the user's standing permission to spawn subagents:
+## Bố cục
 
-@.claude/RULES/1-system-structure.md
-@.claude/RULES/2-advisor-for-complex-tasks.md
-@.claude/RULES/4-subagents-and-worktrees.md
+Mọi thứ chạy được nằm dưới `src/` (xem README, mục "Cấu trúc dự án"): `cli/` (mỗi lệnh một file; `cli/debug/` là công cụ dò tay), `types/` (kiểu dùng chung, một cửa: `import type { Report } from "../types/index.js"`), `core/`, `config/`, `scrape/`, `watch/`, `runner/dispatch.ts`, `store/`, `export/`, `mcp/`, `definitions/`. `config.ts` ở gốc repo. Test ở `tests/`. Panel là dự án con `panel/` với `package.json`, eslint và vitest riêng; nó chỉ gọi các CLI, không import mã bot.
 
-## Project skills (`.claude/skills/`)
+Quy ước:
+- Import trong `src/` có đuôi `.js` (`"./cells.js"`), như các file xung quanh.
+- Tên, mật độ và ngôn ngữ chú thích theo file đang sửa: đọc một file cạnh bên trước khi viết.
+- Selector DOM của Zalo chỉ nằm ở `scrape/scrapeSelectors.ts`.
+- Giá trị chỉnh được (giờ, ngưỡng, số lần thử) đặt trong `config.ts`, có mô tả trong `configDoc.ts` và kiểm trong `configCheck.ts`; không để số tùy ý trong module.
+- Ghi file lúc chạy chỉ dưới `data/` qua `core/atomicWrite.ts`. Không ghi vào `src/`, `docs/` hay gốc repo.
+- Không thêm phụ thuộc khi `package.json` đã có thứ làm được việc đó.
+- Logic mới đi kèm test trong `tests/<tên>.test.ts`; đổi hành vi thì sửa test cũ, đừng xóa.
 
-Skills live in `.claude/skills/` and are edited there directly (no sync step, no source copy in the project). Use them without being asked (each skill's `description` says when not to):
+## Chỗ dễ vỡ (theo khả năng gặp, chi tiết ở README, "Bảo trì")
 
-- Add or change a person's report set (`reportSets`, "thêm người phụ trách", "cấu hình cho người mới"): `cau-hinh-nguoi-phu-trach`. A report TYPE that is not in `npm run reports:list` needs code: `them-loai-bao-cao-moi`.
-- Items "cần xem" in `output/<id>/review_*.json` / fixing a misread message with `overrides.json`: `xu-ly-muc-can-xem`.
-- "Is the system running", bot status, gaps: `giam-sat-van-hanh` (read-only; restarting bots or any write needs the user's yes).
-- Compare an exported Excel with the source messages: `kiem-tra-bao-cao-dau-ra`.
-- Questions about message formats or output files: `du-lieu-nhom-truong` (school groups), `du-lieu-nhom-ky-thuat` (IT groups), `du-lieu-dau-ra` (the 7 Excel files).
-- Read the text in a photo message: `doc-anh-bao-cao` (returns the reading only; nothing is saved).
-- Any long task with several steps: apply `save-token` (classify each step into a model tier, show the plan with the reason for each model, wait for the user's answer). This line is the user's standing permission to delegate the steps to subagents with the model the plan names. Always check what a cheaper model returns before using it.
-
-## Layout
-
-Everything runnable is under `src/` (the table in `.claude/RULES/1-system-structure.md` is the full map): `cli/` (one file per `npm run` command; `cli/debug/` has probing tools), `types/` (the shared types, one door: `import type { Report } from "../types/index.js"`), `core/` (`paths.ts`, atomic writes, the Zalo lock), `constants/` (shared constants, data only: message titles and report labels in `reportTitles.ts`, known misspellings in `spellingAliases.ts`), `config/` (startup checks, key docs, `parseCutoff`), `scrape/`, `watch/`, `runner/`, `chat/`, `total/` (`bot:total`, printing), `lesson/` (parsers, rows, the status Excel files, the 4 technical sheets), `reportSets/`, `leave/` (leave report), `minutes/` (meeting minutes review), `speed/` (internet speed units), `master/` (patching the master files through Excel), `vision/` (photo bundling and reading), `ocr/` (Tesseract wrapper), `store/`, `export/`, `mcp/`. `config.ts` and `chat-rules.json` stay at the project root because they are what you edit; tests are in `tests/`. Derive paths from `src/core/paths.ts`, never from a module's own `import.meta.url`.
-
-## Architecture
-
-Four long-running bots (`bot:watch`, `bot:runner`, `bot:chat`, `bot:total`) and the manual `bot:scrape` share the same core scraping/storage layer. They never call each other: they hand work over through files (the scrape queue, the chat inbox, `data/.runner-state.json`) and the Zalo lock `data/.scrape.lock`. The operations panel in `panel/` only calls `npm run` commands.
-
-- **`src/cli/bot-watch.ts`**: long-running detector, never scrapes: reacts to new messages from one source (see `src/watch/watch.ts`): Zalo Desktop's own WebSocket connection to its chat backend (`src/watch/realtimeListener.ts`; the old toast-popup fallback was removed because the toast is a Windows notification, not a Zalo window), and only enqueues the affected target via `src/scrape/scrapeQueue.ts` (and the chat inbox, see `bot:chat` above). Always restarts Zalo Desktop on startup so the WS source can observe its one-time cipher-key handshake.
-- **`src/cli/bot-runner.ts`**: the orchestrator (`src/runner/`): queue quiet for `runner.quietSeconds` (30 s in the current config.ts, 120 s default in `config:show`), then scrape, sync the DB, extract and build the reports of every report set.
-- **`src/cli/bot-chat.ts`**: auto-reply (`src/chat/`). **`src/cli/bot-total.ts`**: the 9:00 and 15:00 total reports and printing (`src/total/`).
-- **`src/cli/bot-scrape.ts`**: manual, queue-driven: read the scrape queue, scrape only those conversations, clear the ones handled, exit. Nothing runs on a schedule.
-
-All of them share:
-
-- **`src/scrape/desktopScraper.ts`** — the core logic: `ensureZaloReady()` (checks/opens the CDP debug port, killing and relaunching `Zalo.exe` with `--remote-debugging-port` if needed — safe because the login session lives in the local profile, not the process), connects to the main window, finds/opens each target conversation in the sidebar, scrolls to load history until `targetMessageCount`, `sinceTs`, or a stalled scroll height stops it.
-- **`src/scrape/cdp.ts`** — a minimal hand-rolled CDP WebSocket client (`Runtime.evaluate`, `Runtime.addBinding`/`bindingCalled`). Exists because Playwright's `connectOverCDP` can't attach to Zalo Desktop's Electron build (old CDP version, `Browser.setDownloadBehavior` errors).
-- **`src/scrape/scrapeSelectors.ts`** — the CSS selectors for Zalo Desktop's DOM. **This is the most fragile part of the codebase** — a Zalo UI update can silently break it (symptom: message counts drop to 0, or "sidebar item not found"). Fix by running `npm run zalo:debug`, then probing the live DOM via `Runtime.evaluate` over `src/scrape/cdp.ts` and updating selectors to match.
-- **`src/store/messageStore.ts`** — writes/reads `data/<groupId>.json` (one pretty-printed JSON array per thread, rewritten in full — via a temp-file-then-rename — on every save), deduped by `msgId`. This is the only persisted output; there's no separate append-only log or daily export file.
-- **`src/export/exportExcel.ts`** / **`src/cli/export-excel.ts`** — ad-hoc export of an already-scraped thread from the JSON store to `.xlsx`, optionally filtered to one sender.
-- **`src/mcp/server.ts`** — read-only MCP server (`list_threads`, `get_recent_messages`, `search_messages`) exposing `src/store/messageStore.ts` data to MCP clients (Claude Code/Desktop). Never touches Zalo/CDP itself — just reads the JSON files the scraper already wrote, so it works whether or not the scraper is currently running.
-
-## Config (`config.ts`) — the one file you edit for day-to-day changes
-
-`config.ts` is the single place for every tunable, in 13 documented sections (Zalo, targets, scraping, watch, runner, recovery, chat, sessions, phases, total, print, vision, techReports). Modules derive their timing constants from it (they no longer hard-code numbers, e.g. `QUIET_MS = config.runner.quietSeconds * 1000`); `src/config/configCheck.ts` rejects bad values at startup with the offending key; `src/config/configDoc.ts` documents each key for `npm run config:show`. Bots read it only at startup, so restart the affected bot after editing. `statusExportDir` (section 1, default `data/export/trang-thai`, must be absolute) is the root of every status report: a day goes to `<statusExportDir>/<yyMM>/<yyMMdd>/` via `statusReportDir` in `src/core/paths.ts` (4 phases and `bot:total` alike); changing it does not move old files. `excelMaxColumnWidth` (section 1, default 50) is how far `scripts/fill-status-template.ps1` may widen a data column to fit the text (never narrower than the template; longer text is cut at the column edge, rows keep their height; the 4 technical sheets still wrap because their cells hold bullet lists); not applied to in-place layouts (LỊCH NGHỈ PHÉP) or the two master files. Session hours (`config.sessions`) are the one source for both `sessionOf` (src/lesson/time.ts) and `sessionWindow` (src/lesson/recovery.ts).
-
-
-`config.targets` (exact display names as shown in the Zalo Desktop sidebar)
-and the `sinceTs`/`untilTs` time window (via the `todayAt(hour, minute)`
-helper, evaluated against the current day at import time) are the primary
-inputs. Renaming a group in Zalo does not affect storage — `data/<groupId>.json`
-is keyed by the group's real (stable) id, not its display name.
-Full field-by-field reference is in `README.md` under "Cấu hình (`config.ts`)".
-
-## Known fragile points (see README "Bảo trì" section for full detail)
-
-Roughly by likelihood of breaking: DOM selectors (`scrapeSelectors.ts`) first,
-then `config.targets` drifting from actual group names, then message-ID/timestamp
-format varying by message type (e.g. album-photo messages have a different
-`bb_msg_id_...` shape than plain text — only the leading numeric segment is
-parsed out), then `zaloExePath` auto-detection breaking if Zalo changes its
-install layout (e.g. MSIX/Store distribution). `src/watch/realtimeListener.ts`
-is a distinct, more fragile category on its own — an undocumented,
-reverse-engineered wire protocol (cmd/subCmd codes, AES-GCM + gzip framing)
-that could change without any visible UI symptom; it is the only live trigger
-source, so a break there leaves `bot:watch` blind (`npm run watch:status` says so)
-and missed messages are caught by `recover:missing` / the runner's recovery step (the scheduled catch-up scrape was removed on 2026-10-20).
+Selector DOM (`scrapeSelectors.ts`) trước: Zalo đổi giao diện thì số tin về 0 hoặc báo "sidebar item not found"; sửa bằng `npm run zalo:debug` rồi soi DOM qua `src/scrape/cdp.ts`. Kế đến `config.targets` lệch tên nhóm thật (không báo lỗi, chỉ là không theo dõi), định dạng `msgId`/timestamp khác nhau theo loại tin, rồi `zaloExePath` tự dò hỏng nếu Zalo đổi cách cài. `src/watch/realtimeListener.ts` là loại riêng: giao thức nhị phân chưa công bố, dò ngược (cmd/subCmd, AES-GCM + gzip), có thể đổi mà UI không có dấu hiệu gì. Nó là nguồn kích hoạt duy nhất của bot theo dõi; hỏng thì bot theo dõi mù (`npm run watch:status` báo) và tin sót phải vớt bằng `scrape:add` rồi cào tay.

@@ -6,7 +6,7 @@ Mục tiêu: một báo cáo mới là một file JSON mô tả, không phải �
 
 Mới xong **lát đầu tiên**. Hãy hiểu đúng phạm vi:
 
-- Bốn báo cáo kỹ thuật (`attendanceStart`, `attendanceEnd`, `shiftStart`, `shiftEnd`) đã chạy qua engine này (`src/definitions/`, lệnh `fill:tech-reports`). Một bài test so sánh (`tests/definitionTechGolden.test.ts`) với mã cũ đã đóng băng cho kết quả giống nhau, và một lần đối chiếu Excel thật trên 200 ô không có khác biệt nào.
+- Bốn báo cáo của hệ thống gốc (mã `attendanceStart`, `attendanceEnd`, `shiftStart`, `shiftEnd`) là bốn định nghĩa dựng sẵn và đã chạy qua engine này (`src/definitions/`, lệnh `fill:tech-reports`). Một bài test so sánh (`tests/definitionTechGolden.test.ts`) với mã cũ đã đóng băng cho kết quả giống nhau, và một lần đối chiếu Excel thật trên 200 ô không có khác biệt nào.
 - Engine đã đọc được các file `*.json` trong `<dataDir>\definitions\`, kiểm hợp lệ và báo lỗi từng file mà không dừng. **Nhưng hôm nay chưa có tác dụng với báo cáo mới của khách**: `fill:tech-reports` chỉ chạy bốn mã cố định ở trên, mã trùng với bản dựng sẵn thì bản dựng sẵn thắng, và danh sách mã báo cáo trong cấu hình vẫn cố định trong mã. Một file JSON mới đặt vào thư mục `definitions` hiện không tạo ra báo cáo nào.
 - Bản bán (`dist/`) **chưa kèm** `fill:tech-reports`, nên khách chưa dùng engine này.
 - Chưa có giao diện để soạn định nghĩa.
@@ -98,9 +98,9 @@ Tin đúng tiêu đề mà thiếu nhãn bắt buộc không bị bỏ. Nó đư
 ## Việc còn lại (theo thứ tự dự kiến)
 
 1. Đổi `ReportKey` từ danh sách cố định sang chuỗi lúc chạy, để mã của file JSON được bật trong cấu hình.
-2. Chuyển báo cáo VỆ SINH và 5 báo cáo mức 2 (ĐIỆN, NETSUPPORT, ÂM THANH, INTERNET, MÁY TÍNH) sang định nghĩa.
+2. Chuyển các báo cáo còn lại của hệ thống gốc sang định nghĩa, theo bảng phân loại trong bản thiết kế.
 3. Mẫu Excel dùng ô giữ chỗ thay cho việc đo vị trí bằng tay.
 4. Tổng quát hóa khái niệm "ngày học" cho mọi loại báo cáo.
 5. Giao diện soạn định nghĩa trong panel, cho người không biết lập trình.
 
-Các báo cáo cần logic riêng (bảo trì, tốc độ mạng, nghỉ phép, biên bản, điểm danh nội quy) vẫn là code cắm vào, không phải file dữ liệu. Chi tiết phân loại ở bảng 15 mã trong bản thiết kế.
+Báo cáo cần logic riêng (đọc ảnh, vá file tổng, tính toán đặc thù) vẫn là code cắm vào, không phải file dữ liệu. Chi tiết phân loại ở bản thiết kế.
