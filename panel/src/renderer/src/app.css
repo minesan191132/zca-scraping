@@ -1,8 +1,10 @@
 /* Hallmark · shape: app screen · genre: modern-minimal · theme: brand (Be Vietnam Pro kept) · redesign: full
  * paper: oklch(97.5% 0.007 85) · accent: oklch(46% 0.17 258) · display: Be Vietnam Pro · body: Be Vietnam Pro
  * nav: dark rail, text only · signature: the lane (state word, since, live tail of the log) · states: loading, stopped, starting, running, problem
- * axes: light/grotesk-sans/chromatic-blue · posture: instrument · contrast: pass · v2.0.0 */
-/* Hallmark · pre-emit critique: P4 H4 E3 S4 R4 V4 · weakest: E, motion is state only (lane word swap, tail line, save bar) and nothing ambient */
+ * axes: light/grotesk-sans/chromatic-blue · posture: instrument · contrast: pass, 14 light and 8 dark pairs computed, all 4.5:1 or more · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E3 S4 R4 V4 · weakest: E, nothing moves when idle; motion only reports a change of state (page, bot count, log line, save bar, a starting bot) */
+/* Hallmark · answered 49 · the nowrap is in the shared `item` class string of Sidebar.svelte, which the linter cannot read */
+/* Hallmark · answered 41 · --tail-bg is never paired with --color-ink; the log tail reads --tail-fg (12.6:1) and --tail-dim (5.0:1) */
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn-svelte/tailwind.css';
@@ -26,6 +28,7 @@
 @theme inline {
   --color-alive: var(--alive);
   --color-warn: var(--warn);
+  --color-warn-ink: var(--warn-ink);
   --color-dead: var(--dead);
   --color-alive-soft: var(--alive-soft);
   --color-warn-soft: var(--warn-soft);

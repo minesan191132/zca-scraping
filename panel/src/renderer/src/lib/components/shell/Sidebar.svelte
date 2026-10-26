@@ -24,7 +24,7 @@
     'relative flex w-full items-center gap-2 whitespace-nowrap rounded-sm px-3 py-2 text-left text-sm text-sidebar-foreground/80 outline-none transition-colors duration-[var(--dur-micro)] hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring'
   const current =
     'bg-sidebar-accent font-medium text-sidebar-accent-foreground before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:bg-sidebar-primary'
-  const heading = 'px-3 pb-1 pt-5 text-xs font-medium text-sidebar-foreground/55'
+  const heading = 'px-3 pb-1 pt-5 text-xs font-medium text-sidebar-foreground/70'
   const generalPaths = $derived(pathsFor(all, 'general'))
   const general = $derived(config.stateOf(generalPaths))
 </script>
@@ -60,7 +60,7 @@
         <span class="flex-1 truncate">{botName(id)}</span>
         {#if dot.error}<span class="text-xs text-tail-error">{t('side.invalid')}</span
           >{:else if dot.dirty}<span class="text-xs text-tail-warn">{t('side.unsaved')}</span>{/if}
-        <StatusDot state={status.shown(id)} />
+        <StatusDot state={status.shown(id)} label={t(`state.${status.shown(id)}`)} />
       </button>
     {/each}
 

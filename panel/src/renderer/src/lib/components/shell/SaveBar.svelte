@@ -60,7 +60,7 @@
     <div
       class="pointer-events-auto flex w-full max-w-5xl items-center gap-3 rounded-md border border-warn/50 bg-card px-4 py-3"
     >
-      <span class="flex items-center gap-2 text-sm font-medium text-warn">
+      <span class="flex items-center gap-2 text-sm font-medium text-warn-ink">
         <Glyph name={errors > 0 ? 'alert' : 'info'} class="size-4" />
         {errors > 0
           ? t('save.pendingErr', { n: count, e: errors })

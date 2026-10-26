@@ -57,7 +57,7 @@
     <Button variant="outline" size="sm" onclick={() => void config.load()}>{t('cfg.retry')}</Button>
   </div>
 {:else if config.loaded}
-  <p class="mb-4 rounded-sm bg-warn-soft px-3 py-2 text-xs text-warn">
+  <p class="mb-4 rounded-sm bg-warn-soft px-3 py-2 text-xs text-warn-ink">
     {t(project.bundled ? 'cfg.noteBundled' : 'cfg.draftNote', { file: config.overlayFile })}
   </p>
   <div class="space-y-8">

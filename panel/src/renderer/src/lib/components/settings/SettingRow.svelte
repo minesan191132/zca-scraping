@@ -73,7 +73,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <span class="font-medium">{i18n.settingLabel(path)}</span>
         {#if dirty}
-          <Badge variant="secondary" class="bg-warn-soft text-warn">
+          <Badge variant="secondary" class="bg-warn-soft text-warn-ink">
             {t('cfg.unsaved')}
           </Badge>
         {:else if differs}

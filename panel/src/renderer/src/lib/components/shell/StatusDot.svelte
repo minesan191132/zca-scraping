@@ -3,7 +3,11 @@
   import type { ShownState } from '$lib/stores/status.svelte'
 
   // Ô vuông nhỏ màu theo trạng thái. Luôn đứng cạnh chữ nói rõ trạng thái; một mình nó chỉ là trang trí.
-  let { state, class: className }: { state: ShownState; class?: string } = $props()
+  let {
+    state,
+    class: className,
+    label
+  }: { state: ShownState; class?: string; label?: string } = $props()
 
   const tone: Record<ShownState, string> = {
     alive: 'bg-alive',
@@ -22,5 +26,8 @@
     tone[state],
     className
   )}
-  aria-hidden="true"
+  title={label}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
 ></span>

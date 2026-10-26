@@ -55,7 +55,7 @@
         {#if dot.error}
           <span class="ml-1.5 text-xs text-dead">{t('side.invalid')}</span>
         {:else if dot.dirty}
-          <span class="ml-1.5 text-xs text-warn">{t('side.unsaved')}</span>
+          <span class="ml-1.5 text-xs text-warn-ink">{t('side.unsaved')}</span>
         {/if}
       </Tabs.Trigger>
     </Tabs.List>

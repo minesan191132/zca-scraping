@@ -8,9 +8,9 @@
 
   const tone: Record<ShownState, string> = {
     alive: 'bg-alive-soft text-alive',
-    starting: 'bg-warn-soft text-warn',
-    busy: 'bg-warn-soft text-warn',
-    warn: 'bg-warn-soft text-warn',
+    starting: 'bg-warn-soft text-warn-ink',
+    busy: 'bg-warn-soft text-warn-ink',
+    warn: 'bg-warn-soft text-warn-ink',
     dead: 'bg-dead-soft text-dead',
     stopped: 'bg-muted text-muted-foreground',
     loading: 'bg-muted text-muted-foreground'
