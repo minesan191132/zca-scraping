@@ -4,10 +4,42 @@
 
 Bot không có bước đăng nhập riêng. Nó gắn vào phiên Zalo Desktop đã đăng nhập sẵn qua Chrome DevTools Protocol (CDP) và đọc nội dung từ DOM. Chế độ theo dõi còn quan sát WebSocket mà Zalo Desktop tự mở tới backend (qua CDP `Network`) để biết tin mới nhanh hơn. Phần đọc không gửi gì đi. Chỉ `bot:chat` (tắt mặc định) gửi tin, bằng cách gõ vào ô soạn tin của chính phiên Zalo Desktop đó.
 
-> [!NOTE]
-> Đây là công cụ tự động hoá cá nhân, không phải sản phẩm cho nhiều người dùng. Nó phụ thuộc vào cấu trúc DOM hiện tại của Zalo Desktop. Đọc [Bảo trì & giới hạn đã biết](#bảo-trì--giới-hạn-đã-biết) trước khi chạy lâu dài.
+> [!IMPORTANT]
+> **Đây là bản Beta "Báo Cáo Nhóm"**: lõi cào tin để bán cho người khác. Phần lớn README bên dưới mô tả hệ thống đầy đủ của tác giả (nhiều bot, báo cáo Excel theo người phụ trách). Bản bán KHÔNG kèm các báo cáo đó. Đọc [Bản Beta](#bản-beta-báo-cáo-nhóm) ngay dưới đây để biết bản bán gồm gì và khác ở đâu.
 
-Tài liệu liên quan: [docs/GUIDE.md](docs/GUIDE.md) (cài đặt, chạy nền, xử lý sự cố), [docs/QUY-TRINH.md](docs/QUY-TRINH.md) (quy trình báo cáo buổi dạy).
+> [!NOTE]
+> Phụ thuộc vào cấu trúc DOM hiện tại của Zalo Desktop. Đọc [Bảo trì & giới hạn đã biết](#bảo-trì--giới-hạn-đã-biết) trước khi chạy lâu dài.
+
+Tài liệu liên quan (trong `docs/`): [van-hanh-ban-ban.md](docs/van-hanh-ban-ban.md) (cấp giấy phép, phát hành, sao lưu khóa), [huong-dan-khach-hang.md](docs/huong-dan-khach-hang.md) (cài và dùng, gửi cho khách), [dinh-nghia-bao-cao.md](docs/dinh-nghia-bao-cao.md) (định nghĩa báo cáo bằng file JSON), và các bản thiết kế trong `docs/superpowers/`.
+
+## Bản Beta (Báo Cáo Nhóm)
+
+Bản bán chỉ gồm lõi cào tin, một bộ điều phối mỏng, panel điều khiển và kiểm giấy phép. Không có bot chat, bot tổng, bộ báo cáo Excel theo người, đọc ảnh, đồng bộ SQL Server.
+
+**Khác với hệ thống đầy đủ**
+
+| | Hệ thống đầy đủ (chạy từ mã nguồn) | Bản bán |
+|---|---|---|
+| Cấu hình | `config.ts` | `config.json` trong `%LOCALAPPDATA%\BaoCaoNhom` (nạp đè lên mặc định, mặc định không chứa giá trị riêng nào). Mẫu: `config.example.json` |
+| Dữ liệu | `data/`, `output/` cạnh mã | `%LOCALAPPDATA%\BaoCaoNhom\data`. Hai biến môi trường `ZBOT_HOME` (dữ liệu, cấu hình) và `ZBOT_CODE_ROOT` (mã) tách hai nơi; chỉ `src/core/paths.ts` đọc chúng |
+| Bot | `bot:watch`, `bot:runner`, `bot:chat`, `bot:total`, `bot:scrape` | `bot:watch` (`bot-watch-core`) và `bot:dispatch` (chỉ cào hàng chờ). Bot chạy bằng chính `bao-cao-nhom.exe` ở chế độ Node (`ELECTRON_RUN_AS_NODE=1`), khách không cần cài Node |
+| Mã | chạy `tsx src/cli/*.ts` | `npm run build:dist` gộp các CLI bằng esbuild vào `dist/cli/*.js`; `scripts/distCheck.mjs` chặn việc đưa file riêng tư hay khóa riêng vào `dist` |
+| Giấy phép | không | bắt buộc: bot điều khiển Zalo thoát với mã 3 nếu không có giấy phép hợp lệ (`src/core/license.ts`, `licenseGate.ts`) |
+| Cập nhật | không | `electron-updater` qua GitHub Releases; cài ở lần mở panel sau, không bao giờ khi bot đang chạy |
+| Báo cáo | 15 mã báo cáo | chưa kèm. Engine định nghĩa báo cáo bằng dữ liệu nằm trong `src/definitions/` (xem [dinh-nghia-bao-cao.md](docs/dinh-nghia-bao-cao.md)) |
+
+**Lệnh cho người làm bản bán**
+
+```bash
+npm run build:dist                 # gộp CLI vào dist/ và kiểm (không file riêng tư, không khóa riêng)
+npm run license:issue -- --customer "<tên>" --machine <MachineGuid> --days 90 --key <khóa riêng PEM> --out <file>   # CHỈ máy tác giả
+cd panel && npm run build:product:unpack   # thử không cài: panel/dist-product/win-unpacked
+cd panel && npm run build:product          # file cài NSIS + latest.yml
+```
+
+Tên sản phẩm "Báo Cáo Nhóm", `appId` `com.baocaonhom.app` và thư mục dữ liệu `BaoCaoNhom` rất khó đổi sau khi có khách cài. Quy trình cấp giấy phép và phát hành: [van-hanh-ban-ban.md](docs/van-hanh-ban-ban.md).
+
+Không chạy `bot:watch` hay `bot:runner` của hệ thống đầy đủ cùng lúc với bản cài trên một máy: cả hai cùng điều khiển một Zalo Desktop qua cổng 9222.
 
 ## Vì sao dùng Zalo Desktop thay vì web hay API `zca-js`
 
@@ -58,7 +90,7 @@ npm run bot:runner     # cào hàng chờ và dựng báo cáo
 
 Chỉ cào một lần bằng tay: `npm run scrape:add -- "Tên nhóm"` rồi `npm run bot:scrape`.
 
-Lần chạy đầu, bot tự tắt và mở lại Zalo Desktop để bật cổng debug (xem [Luồng hoạt động](#luồng-hoạt-động-chi-tiết)). Phiên đăng nhập không mất vì nó nằm trong profile cục bộ của app, không nằm trong tiến trình. Hướng dẫn đầy đủ (DB, Excel mẫu, chạy nền, agent): [docs/GUIDE.md](docs/GUIDE.md).
+Lần chạy đầu, bot tự tắt và mở lại Zalo Desktop để bật cổng debug (xem [Luồng hoạt động](#luồng-hoạt-động-chi-tiết)). Phiên đăng nhập không mất vì nó nằm trong profile cục bộ của app, không nằm trong tiến trình.
 
 ## Cấu hình (`config.ts`)
 
@@ -146,7 +178,7 @@ Trước đây còn nguồn thứ hai là popup thông báo (toast, `znotificati
 - Chỉ tiến trình giữ `data/.scrape.lock` mới điều khiển giao diện, nên không có chuyện hai tiến trình cùng bấm và cuộn một cửa sổ Zalo.
 
 > [!NOTE]
-> Các bot là tiến trình Node thường: đóng terminal là tắt, và không tự chạy lại khi crash hoặc khi máy khởi động lại. Muốn chạy nền cùng phiên đăng nhập, xem [docs/GUIDE.md](docs/GUIDE.md) mục 8 (tác vụ Windows `schtasks`, hoặc PM2 như dịch vụ Windows). Mã không phụ thuộc cách bạn giữ tiến trình sống.
+> Các bot là tiến trình Node thường: đóng terminal là tắt, và không tự chạy lại khi crash hoặc khi máy khởi động lại. Muốn chạy nền cùng phiên đăng nhập, dùng tác vụ Windows `schtasks` hoặc PM2 như dịch vụ Windows. Mã không phụ thuộc cách bạn giữ tiến trình sống.
 
 ## Sử dụng
 
@@ -294,9 +326,9 @@ Mỗi lần chỉ xử lý một buổi của một ngày (ranh giới buổi �
 
 Tên Trường và Phường/Xã trong 4 file trạng thái (NETSUPPORT, ÂM THANH, INTERNET, MÁY TÍNH) được chép nguyên văn từ tin của nhóm trường; tin cũ thiếu hai dòng này thì lấy từ tên nhóm. File MÁY TÍNH xếp theo XẾP LOẠI từ A đến E, dòng chưa có xếp loại nằm cuối, cùng trường nằm liền nhau. Nhãn, tiêu đề và giá trị gõ sai đã biết nằm ở `src/constants/spellingAliases.ts` (thêm một dòng là parser nhận thêm dạng sai đó, cần khởi động lại bot).
 
-Chi tiết từng bước: [docs/QUY-TRINH.md](docs/QUY-TRINH.md). Cài đặt và chạy tự động với agent: [docs/GUIDE.md](docs/GUIDE.md). Thiết kế gốc: `docs/superpowers/specs/2026-09-24-teacher-lesson-report-extraction-design.md`.
+Quy trình báo cáo buổi dạy của hệ thống đầy đủ không có trong bản công khai này.
 
-Khi `bot:watch` từng chết, runner tự khôi phục (chỉ cào lại các nhóm còn thiếu báo cáo). `npm run recover:missing` làm việc đó bằng tay và liệt kê tin đã lỡ (bước 1b trong QUY-TRINH.md). Xem tình trạng bằng `npm run watch:status`.
+Khi `bot:watch` từng chết, runner tự khôi phục (chỉ cào lại các nhóm còn thiếu báo cáo). `npm run recover:missing` làm việc đó bằng tay và liệt kê tin đã lỡ. Xem tình trạng bằng `npm run watch:status`.
 
 ## Cấu trúc dự án
 
@@ -332,7 +364,7 @@ src/
   mcp/                           server.ts: MCP server chỉ-đọc (list_threads, get_recent_messages, search_messages)
 scripts/                         script PowerShell điền và in Excel qua COM, benchLoad.ts
 tests/                           unit test (node:test)
-docs/                            GUIDE.md, QUY-TRINH.md, tài liệu từng báo cáo, spec và kế hoạch
+docs/                            van-hanh-ban-ban.md, huong-dan-khach-hang.md, dinh-nghia-bao-cao.md, spec và kế hoạch của bản Beta
 panel/                           app Electron vận hành, dự án con có package.json riêng
 
 data/                            dữ liệu chạy (không commit)
@@ -401,4 +433,4 @@ Xếp theo khả năng gặp, cao đến thấp:
 
 ## Lên lịch chạy tự động
 
-Các bot chạy nền (`bot:watch`, `bot:runner`, `bot:total`, `bot:chat`) không cần lịch. Chúng chỉ cần được khởi động cùng phiên đăng nhập và giữ sống. Cách làm (tác vụ Windows `schtasks`, hoặc PM2 như dịch vụ Windows) và lịch giám sát của agent (`openclaw cron`, chạy sau mỗi buổi) nằm ở [docs/GUIDE.md](docs/GUIDE.md) mục 8. `autoLaunchZalo: true` bảo đảm Zalo Desktop tự khởi động lại kèm cổng debug, kể cả khi máy chưa mở Zalo hoặc Zalo đang mở không kèm cờ debug.
+Các bot chạy nền (`bot:watch`, `bot:runner`, `bot:total`, `bot:chat`) không cần lịch. Chúng chỉ cần được khởi động cùng phiên đăng nhập và giữ sống. Cách giữ sống: tác vụ Windows `schtasks`, hoặc PM2 như dịch vụ Windows. `autoLaunchZalo: true` bảo đảm Zalo Desktop tự khởi động lại kèm cổng debug, kể cả khi máy chưa mở Zalo hoặc Zalo đang mở không kèm cờ debug.

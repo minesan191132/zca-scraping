@@ -24,9 +24,11 @@ Vì vậy bản `distwin-unpacked` nằm trong repo mở thẳng vào tổng qua
 
 Thư mục dự án phải định nghĩa các lệnh `bot:*`, `*:status`, `today`, `total:once` (thiếu thì app báo tên lệnh thiếu) và `config:dump` (thiếu thì chỉ tab Cấu hình không dùng được). `config:dump` có ở nhánh `feat/electron-gui-demo` của repo bot.
 
-## Bản lưu cấu hình là bản thử
+## Lưu cấu hình
 
-Nút Lưu ghi vào `settings.draft.json` trong thư mục dữ liệu người dùng. Không bot nào đọc file này, nên lưu không đổi cách bot chạy. Ghi thật vào `config.ts` là việc riêng chưa làm.
+Ở chế độ nguồn (chạy trong repo), nút Lưu ghi `settings.draft.json` trong thư mục dữ liệu người dùng; không bot nào đọc file này nên lưu không đổi cách bot chạy.
+
+Ở bản cài (bản bán), nút Lưu ghi `config.json` trong `%LOCALAPPDATA%\BaoCaoNhom`, trộn với những gì đã có trong file, và bot đọc file này khi khởi động lại. Nếu bộ kiểm cấu hình từ chối giá trị, nút Lưu báo lỗi và không ghi. Chỉ các cài đặt mà bản bán thật sự đọc (`cdpPort`, `zaloExePath`, `targets`, `watch.*`, `runner.*`...) được hiện (`src/shared/bundled-settings.ts`).
 
 ## Kiểm thử giao diện bằng ảnh chụp
 

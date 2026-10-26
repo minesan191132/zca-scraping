@@ -17,6 +17,16 @@ than opening one of its own. See `README.md` for the full design rationale
 walkthrough — it's kept in sync with the code and is the source of truth for
 anything not covered below.
 
+## Bản Beta "Báo Cáo Nhóm" (đọc trước khi sửa)
+
+Repo này là bản bán. Phần lớn tài liệu dưới đây mô tả hệ thống đầy đủ của tác giả; bản bán chỉ có `bot:watch` (lõi), `bot:dispatch`, panel và giấy phép. Tổng quan, bảng khác biệt và lệnh dựng: README, mục "Bản Beta". Vận hành: `docs/van-hanh-ban-ban.md`. Định nghĩa báo cáo: `docs/dinh-nghia-bao-cao.md`.
+
+- Cấu hình bản bán là `config.json` ở `ZBOT_HOME`, nạp đè lên mặc định trong `config.ts` (`src/config/configFile.ts`). Mặc định KHÔNG chứa tên nhóm, người, trường hay đường dẫn riêng. Test đọc `tests/fixtures/config.test.json`, không đọc `config.json` thật.
+- `dist/` do `npm run build:dist` sinh, không sửa tay, không commit. `scripts/distCheck.mjs` phải qua.
+- KHÔNG đưa khóa riêng giấy phép vào repo, `dist/` hay gói cài. Nó nằm ngoài repo; chỉ `src/cli/issue-license.ts` đọc nó và file đó không nằm trong `dist`.
+- Tên, `appId`, thư mục dữ liệu đã chốt (`Báo Cáo Nhóm`, `com.baocaonhom.app`, `BaoCaoNhom`): không đổi.
+- Mọi tên trường, tên người, id bộ trong test và tài liệu là tên giả. Không thêm tên thật vào repo công khai này.
+
 ## Commands
 
 ```bash
