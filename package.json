@@ -65,7 +65,7 @@
         "cdp",
         "mcp"
     ],
-    "license": "MIT",
+    "license": "UNLICENSED",
     "dependencies": {
         "@modelcontextprotocol/sdk": "^1.12.0",
         "mssql": "^12.7.2",
