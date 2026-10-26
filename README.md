@@ -1,6 +1,6 @@
 # Báo Cáo Nhóm (Beta)
 
-Đọc tin nhắn của các nhóm Zalo chỉ định từ **Zalo Desktop** (app Windows, không phải web), theo dõi tin mới theo thời gian thực và lưu về máy dưới dạng file JSON. Kèm một app điều khiển (panel) và kiểm giấy phép để phân phối cho người khác.
+Đọc tin nhắn của các nhóm Zalo chỉ định từ **Zalo Desktop** (app Windows, không phải web), theo dõi tin mới theo thời gian thực và lưu về máy dưới dạng file JSON. Kèm một app điều khiển (panel) để phân phối cho người khác.
 
 Bot không có bước đăng nhập riêng. Nó gắn vào phiên Zalo Desktop đã đăng nhập sẵn qua Chrome DevTools Protocol (CDP) và đọc nội dung từ DOM. Chế độ theo dõi còn quan sát WebSocket mà Zalo Desktop tự mở tới backend (qua CDP `Network`) để biết tin mới ở nhóm nào, rồi chỉ cào nhóm đó. Chỉ đọc: không có đường gửi hay trả lời tin.
 
@@ -15,8 +15,8 @@ Cây mã còn chứa mã của hệ thống báo cáo đầy đủ mà bản Bet
 
 | Tài liệu | Dành cho |
 |---|---|
-| [docs/huong-dan-khach-hang.md](docs/huong-dan-khach-hang.md) | Khách: cài, nhập giấy phép, khai nhóm, bật bot |
-| [docs/van-hanh-ban-ban.md](docs/van-hanh-ban-ban.md) | Người bán: cấp giấy phép, phát hành, sao lưu khóa |
+| [docs/huong-dan-khach-hang.md](docs/huong-dan-khach-hang.md) | Khách: cài, khai nhóm, bật bot |
+| [docs/van-hanh-ban-ban.md](docs/van-hanh-ban-ban.md) | Người bán: phát hành bản cài, cập nhật; giấy phép (hiện tắt) |
 | [docs/dinh-nghia-bao-cao.md](docs/dinh-nghia-bao-cao.md) | Định dạng báo cáo bằng file JSON và trạng thái engine |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Thiết kế và kế hoạch triển khai |
 
@@ -38,10 +38,10 @@ Playwright `connectOverCDP` không gắn được vào Electron của Zalo Deskt
 | Cào tay | `npm run bot:scrape` | Đọc hàng chờ, chỉ mở các nhóm trong đó, cuộn lấy lịch sử, đánh dấu đã xử lý rồi thoát. Hàng chờ rỗng thì thoát ngay, không đụng Zalo Desktop. |
 | Xếp nhóm vào hàng chờ | `npm run scrape:add -- "Tên nhóm"` | Xếp một nhóm trong `config.targets` vào hàng chờ: nhóm mới chưa cào lần nào, hoặc ép cào lại. Chỉ ghi file. |
 | Trạng thái | `npm run watch:status`, `npx tsx src/cli/dispatch-status.ts` | Bot còn sống không, nhịp tim gần nhất, hàng chờ, khoảng gián đoạn. Thoát mã 2 khi không sống. |
-| Giấy phép | `npx tsx src/cli/license-info.ts` | In trạng thái giấy phép. Cấp giấy phép: `npm run license:issue` (chỉ máy người bán). |
+| Giấy phép (đang tắt) | `npx tsx src/cli/license-info.ts` | Mô-đun giấy phép còn trong mã nhưng không bot nào gọi nó; lệnh này chỉ in trạng thái. Cấp giấy phép: `npm run license:issue` (chỉ máy người bán). Xem mục "Bản bán". |
 | Xuất Excel | `npm run export:excel <groupId> [senderName]` | Xuất tin đã cào của một nhóm ra `.xlsx`, có thể lọc theo người gửi. |
 | MCP server | `npm run mcp` | Cho Claude Code/Desktop đọc dữ liệu đã cào qua 3 tool chỉ-đọc. |
-| Panel | `panel/` | App Electron: giấy phép, cấu hình, bật tắt hai bot, xem nhật ký. Dự án con có `package.json` riêng. |
+| Panel | `panel/` | App Electron: cấu hình, bật tắt hai bot, xem nhật ký. Dự án con có `package.json` riêng. |
 
 Bản cài chạy cùng các CLI này đã gộp vào `dist/cli/*.js` bằng `esbuild`, chạy bằng chính `bao-cao-nhom.exe` ở chế độ Node (`ELECTRON_RUN_AS_NODE=1`) nên khách không cần cài Node.
 
@@ -60,7 +60,6 @@ Chỉ cào một lần bằng tay: `npm run scrape:add -- "Tên nhóm"` rồi `n
 
 Lần chạy đầu, bot tự tắt và mở lại Zalo Desktop để bật cổng debug (xem [Luồng hoạt động](#luồng-hoạt-động-chi-tiết)). Phiên đăng nhập không mất vì nó nằm trong profile cục bộ của app, không nằm trong tiến trình.
 
-Nếu có giấy phép (`license.json` ở thư mục dữ liệu), hoặc đang chạy từ mã nguồn, bot chạy. Bản đã gộp (`ZBOT_BUNDLED=1`) từ chối chạy nếu không có giấy phép hợp lệ và thoát với mã 3.
 
 Lệnh kiểm tra:
 
@@ -156,10 +155,10 @@ curl http://127.0.0.1:9222/json/version     # có JSON trả về nghĩa là CDP
 
 `zalo:debug` chỉ gọi `ensureZaloReady()`, in URL debug rồi thoát, không đụng `config.targets` hay `data/`. `src/cli/debug/*` là các script chẩn đoán dùng một lần để dò selector khi Zalo Desktop đổi giao diện.
 
-## Bản bán: giấy phép, gói cài, cập nhật
+## Bản bán: gói cài, cập nhật, giấy phép (tắt)
 
 - **Gói cài**: `npm run build:dist` ở thư mục gốc (gộp CLI vào `dist/`, `scripts/distCheck.mjs` chặn việc đưa file riêng tư hay khóa riêng vào), rồi trong `panel/`: `npm run build:product:unpack` (thử, không cài) hoặc `npm run build:product` (file cài NSIS + `latest.yml`). Cấu hình đóng gói: `panel/electron-builder.product.yml`.
-- **Giấy phép**: file `{payload, sig}` ký Ed25519, gắn với MachineGuid của Windows, kiểm ngoại tuyến (`src/core/license.ts`, `licenseGate.ts`). Bot điều khiển Zalo thoát với mã 3 nếu giấy phép thiếu, sai chữ ký, hết hạn hay cấp cho máy khác. Khóa riêng nằm ngoài repo.
+- **Giấy phép**: **đang tắt**, bot chạy không cần giấy phép. Mô-đun (Ed25519, gắn MachineGuid, kiểm ngoại tuyến: `src/core/license.ts`, `licenseGate.ts`) và lệnh cấp `license:issue` vẫn còn trong mã. Muốn bật lại: thêm `requireLicense()` vào đầu `bot-watch-core`, `bot-dispatch`, `bot-scrape`, thêm lại thẻ giấy phép vào Tổng quan của panel (kênh IPC `license:*` còn nguyên), và sửa test ở `tests/licenseGate.test.ts`.
 - **Cập nhật**: `electron-updater` qua GitHub Releases của repo công khai; bản mới cài ở lần mở panel sau, không bao giờ khi bot đang chạy.
 - **Đặt tên** "Báo Cáo Nhóm", `appId` `com.baocaonhom.app`, thư mục dữ liệu `BaoCaoNhom`: rất khó đổi sau khi có khách cài.
 

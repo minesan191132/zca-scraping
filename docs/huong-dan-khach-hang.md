@@ -21,17 +21,6 @@ Bản Beta là phần lõi: theo dõi tin mới, cào tin của nhóm có tin m�
 2. Windows có thể hiện "Windows đã bảo vệ PC của bạn", vì bản Beta chưa ký số. Bấm **Thông tin thêm**, rồi **Vẫn chạy**.
 3. Chọn thư mục cài hoặc để mặc định, bấm cài. Một lối tắt **Báo Cáo Nhóm** xuất hiện trên màn hình nền.
 
-## Lần đầu: nhập giấy phép
-
-1. Mở **Báo Cáo Nhóm**. Thẻ **Giấy phép** báo "Chưa có giấy phép" và hiện **Mã máy**.
-2. Bấm **Chép mã máy** và gửi mã cho nhà cung cấp.
-3. Nhận file giấy phép (đuôi `.json`), bấm **Nhập giấy phép** và chọn file đó.
-4. Thẻ chuyển thành "Giấy phép hợp lệ", kèm tên và ngày hết hạn.
-
-Giấy phép chỉ dùng cho một máy. Đổi máy hoặc cài lại Windows thì mã máy đổi và cần giấy phép mới. Giấy phép Beta có hạn 90 ngày; gần hết hạn hãy xin gia hạn.
-
-Chưa có giấy phép hợp lệ thì các bot không chạy. Panel vẫn mở được để bạn nhập giấy phép.
-
 ## Khai báo nhóm cần theo dõi
 
 1. Vào trang **Chung** (thanh bên trái), tìm cài đặt **targets** (danh sách nhóm).
@@ -63,7 +52,6 @@ Lưu ý quan trọng:
 Mọi thứ nằm trong thư mục `%LOCALAPPDATA%\BaoCaoNhom` (gõ đường dẫn này vào thanh địa chỉ của File Explorer):
 
 - `config.json`: cài đặt của bạn.
-- `license.json`: giấy phép.
 - `data\`: tin đã cào, mỗi nhóm một file `.json`.
 
 Gỡ cài đặt phần mềm không xóa thư mục này.
@@ -76,15 +64,11 @@ Phần mềm tự kiểm bản mới khi mở và mỗi 6 giờ. Khi có, nó t�
 
 | Hiện tượng | Nguyên nhân thường gặp | Cách xử lý |
 |---|---|---|
-| "Chưa có giấy phép" | Chưa nhập file giấy phép | Làm các bước ở mục giấy phép |
-| "Giấy phép này cấp cho máy khác" | Đổi máy hoặc cài lại Windows | Gửi mã máy mới, xin giấy phép mới |
-| "Giấy phép đã hết hạn" | Quá 90 ngày | Xin gia hạn, nhập file mới |
-| "File giấy phép bị hỏng" hay "chữ ký sai" | File bị sửa hoặc tải lỗi | Nhập lại đúng file gốc nhận được |
 | Bot bật nhưng không có tin nào | Tên nhóm sai chính tả, hoặc Zalo chưa đăng nhập | So lại tên nhóm với thanh bên Zalo; đăng nhập Zalo Desktop |
 | Bot dừng khi tôi đóng ứng dụng | Đúng thiết kế | Để ứng dụng mở khi cần thu thập |
 | Lưu cấu hình báo lỗi | Giá trị không hợp lệ | Đọc dòng lỗi, sửa đúng ô đó |
 
-Khi cần hỗ trợ, gửi cho nhà cung cấp: ảnh màn hình thẻ Giấy phép, và nội dung nhật ký ở trang bot.
+Khi cần hỗ trợ, gửi cho nhà cung cấp: ảnh màn hình trang Tổng quan, và nội dung nhật ký ở trang bot.
 
 ## Quyền riêng tư
 

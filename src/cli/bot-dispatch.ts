@@ -5,7 +5,6 @@ import { MessageStore } from "../store/messageStore.js";
 import { decideDispatch, dispatchQueueTimes, runDispatchCycle } from "../runner/dispatch.js";
 import { beatRunner, readRunnerState, recordCycle, setPhase, startRunner, stopRunner } from "../runner/runnerState.js";
 import { config } from "../../config.js";
-import { requireLicense } from "../core/licenseGate.js";
 import { HEARTBEAT_INTERVAL_MS } from "../watch/watchState.js";
 import type { CycleSummary } from "../types/index.js";
 
@@ -23,7 +22,6 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const log = (m: string) => console.log(`${new Date().toISOString()} ${m}`);
 
 async function main(): Promise<void> {
-    requireLicense();
     const started = startRunner(Date.now(), process.pid);
     if (started.anotherInstanceAlive) {
         console.error("[dispatch] đang có một bộ điều phối khác chạy — thoát.");

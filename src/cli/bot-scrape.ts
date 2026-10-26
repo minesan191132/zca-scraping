@@ -3,7 +3,6 @@ import { runQueuedScrape } from "../scrape/queueRun.js";
 import { completeSnapshot, importLegacyQueue, takeSnapshot } from "../scrape/scrapeQueue.js";
 import { acquireScrapeLock, releaseScrapeLock } from "../core/scrapeLock.js";
 import { MessageStore } from "../store/messageStore.js";
-import { requireLicense } from "../core/licenseGate.js";
 
 /**
  * Manual, queue-driven scrape. `bot:watch` never scrapes: it only records which
@@ -16,7 +15,6 @@ import { requireLicense } from "../core/licenseGate.js";
  * src/core/scrapeLock.ts. See src/scrape/scrapeQueue.ts and src/scrape/queueRun.ts.
  */
 async function main(): Promise<void> {
-    requireLicense();
     const lock = acquireScrapeLock("bot:scrape");
     if (!lock.ok) {
         console.error(`[scrape] đang có "${lock.heldBy.owner}" (pid ${lock.heldBy.pid}) điều khiển Zalo Desktop — không chạy song song. Thử lại sau khi nó xong.`);

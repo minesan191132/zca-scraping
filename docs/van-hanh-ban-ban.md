@@ -1,6 +1,9 @@
 # Vận hành bản bán: cấp giấy phép, phát hành, sao lưu
 
-Tài liệu cho người bán (tác vụ chỉ làm ở máy của bạn). Khách không cần đọc. Hướng dẫn cho khách: [huong-dan-khach-hang.md](huong-dan-khach-hang.md).
+Tài liệu cho người bán (tác vụ chỉ làm ở máy của bạn). Khách không cần đọc.
+
+> [!IMPORTANT]
+> **Yêu cầu giấy phép hiện đang tắt.** Bản bán chạy không cần giấy phép và panel không hiện thẻ giấy phép. Mục "Khóa giấy phép" và "Cấp giấy phép cho một khách" bên dưới mô tả cách dùng khi bật lại (xem README, mục "Bản bán"). Phần "Phát hành một bản mới" vẫn áp dụng như thường. Hướng dẫn cho khách: [huong-dan-khach-hang.md](huong-dan-khach-hang.md).
 
 ## Khóa giấy phép
 

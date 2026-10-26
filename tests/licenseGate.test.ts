@@ -52,7 +52,7 @@ test("missing và wrong-machine nhắc gửi mã máy; mã máy chỉ in khi đ�
     }
 });
 
-test("ba CLI điều khiển Zalo gọi requireLicense, các CLI khác thì không", () => {
-    for (const f of ["bot-watch-core", "bot-dispatch", "bot-scrape"]) assert.ok(read(`src/cli/${f}.ts`).includes("requireLicense()"), f);
-    for (const f of ["config-dump", "export-excel"]) assert.ok(!read(`src/cli/${f}.ts`).includes("requireLicense"), f);
+// Hiện không CLI nào chặn bằng giấy phép (chủ sản phẩm đã bỏ yêu cầu này). Mô-đun cổng vẫn còn để bật lại: thêm `requireLicense()` vào dòng đầu của ba bot điều khiển Zalo và sửa lại test này.
+test("không CLI nào gọi requireLicense: bản bán chạy không cần giấy phép", () => {
+    for (const f of ["bot-watch-core", "bot-dispatch", "bot-scrape", "config-dump", "export-excel"]) assert.ok(!read(`src/cli/${f}.ts`).includes("requireLicense"), f);
 });

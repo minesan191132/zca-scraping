@@ -4,7 +4,6 @@
   import { Button } from '$lib/components/ui/button'
   import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import BotCard from '$lib/components/bot/BotCard.svelte'
-  import LicenseCard from '$lib/components/shell/LicenseCard.svelte'
   import { t } from '$lib/i18n/index.svelte'
   import { DUR_SHORT, ms } from '$lib/motion'
   import { project } from '$lib/stores/project.svelte'
@@ -22,8 +21,6 @@
 </script>
 
 <div class="space-y-6">
-  {#if project.bundled}<LicenseCard />{/if}
-
   <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div>
       <p class="num text-3xl font-semibold leading-none">

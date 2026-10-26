@@ -1,6 +1,6 @@
 # Báo Cáo Nhóm, panel điều khiển
 
-App Windows (Electron) để nhập giấy phép, chỉnh cấu hình, bật và tắt hai bot (theo dõi tin, điều phối cào), xem trạng thái và nhật ký. App chỉ chạy các CLI của dự án bot, không import mã của bot.
+App Windows (Electron) để chỉnh cấu hình, bật và tắt hai bot (theo dõi tin, điều phối cào), xem trạng thái và nhật ký. App chỉ chạy các CLI của dự án bot, không import mã của bot.
 
 Công nghệ: TypeScript, Svelte 5, electron-vite, Tailwind CSS 4, shadcn-svelte, Electron Builder, `electron-updater`. Thiết kế ở `docs/design.md`.
 
@@ -29,7 +29,7 @@ Thứ tự tìm thư mục dự án bot ở chế độ nguồn: biến môi tr�
 
 ## Giấy phép
 
-Thẻ Giấy phép hiện trạng thái, mã máy (có nút chép) và nút nhập file giấy phép. Nhập file bị từ chối thì giấy phép đang dùng được giữ nguyên. Cách kiểm và cách cấp: `docs/van-hanh-ban-ban.md` ở gốc repo.
+Đang tắt: panel không hiện thẻ giấy phép và bot chạy không cần giấy phép. Dịch vụ `LicenseService` và các kênh IPC `license:*` ở tiến trình chính vẫn còn, chưa có giao diện dùng chúng. Muốn bật lại xem README ở gốc repo, mục "Bản bán".
 
 ## Cập nhật tự động
 

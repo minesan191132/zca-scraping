@@ -6,7 +6,7 @@ Hướng dẫn cho Claude Code (claude.ai/code) khi làm việc trong repo này.
 
 **Báo Cáo Nhóm (Beta)**: đọc tin nhắn của các nhóm Zalo từ **Zalo Desktop** (app Windows, không phải chat.zalo.me) bằng cách gắn vào nó qua Chrome DevTools Protocol, cào DOM lấy nội dung, và (ở chế độ theo dõi) quan sát WebSocket của chính Zalo Desktop qua CDP `Network` như một tín hiệu nhanh, làm hết sức, cho biết "nhóm X có tin mới" (`src/watch/realtimeListener.ts`). Chỉ đọc: không có đường gửi tin, không có bước đăng nhập riêng, dùng lại phiên Zalo Desktop đã đăng nhập.
 
-Đây là bản để phân phối cho người khác: lõi cào tin, một bộ điều phối mỏng, panel Electron và kiểm giấy phép. Nó **không** kèm báo cáo nghiệp vụ nào. Cây mã còn chứa mã của hệ thống báo cáo đầy đủ mà bản này được tách ra (các thư mục `chat/`, `total/`, `lesson/`, `reportSets/`, `leave/`, `minutes/`, `master/`, `vision/`, `ocr/`, `runner/` ngoài `dispatch.ts`); phần đó không thuộc bản bán và không được đóng vào gói. README là nguồn sự thật cho thiết kế và luồng dữ liệu.
+Đây là bản để phân phối cho người khác: lõi cào tin, một bộ điều phối mỏng và panel Electron. Nó **không** kèm báo cáo nghiệp vụ nào. Cây mã còn chứa mã của hệ thống báo cáo đầy đủ mà bản này được tách ra (các thư mục `chat/`, `total/`, `lesson/`, `reportSets/`, `leave/`, `minutes/`, `master/`, `vision/`, `ocr/`, `runner/` ngoài `dispatch.ts`); phần đó không thuộc bản bán và không được đóng vào gói. README là nguồn sự thật cho thiết kế và luồng dữ liệu.
 
 ## Lệnh
 
@@ -50,7 +50,8 @@ Bot theo dõi chỉ nối một dòng cho mỗi tin vào `data/.scrape-events-<n
 ## Bản bán: những điều không được phá
 
 - **Khóa riêng giấy phép không bao giờ vào repo, `dist/` hay gói cài.** Nó nằm ngoài repo; chỉ `src/cli/issue-license.ts` đọc nó và file đó không thuộc `dist`. `scripts/distCheck.mjs` quét `dist/` tìm khóa riêng; `.gitignore` chặn `*.pem`, `license-private*`, `/license.json`, `/config.json`.
-- Bot điều khiển Zalo (`bot-watch-core`, `bot-dispatch`, `bot-scrape`) gọi `requireLicense()` (`src/core/licenseGate.ts`); khi dựng, esbuild thay `process.env.ZBOT_BUNDLED` bằng `"1"` nên bản đã gộp thoát mã 3 nếu giấy phép không hợp lệ. Chạy từ mã nguồn thì không bị chặn.
+  (Giấy phép hiện không bị bắt buộc, nhưng cặp khóa vẫn có thể được dùng lại, nên quy tắc này vẫn giữ.)
+- Giấy phép **đang tắt**: `bot-watch-core`, `bot-dispatch`, `bot-scrape` không gọi `requireLicense()` và panel không hiện thẻ giấy phép. Mô-đun `src/core/licenseGate.ts` và `license.ts` còn nguyên để bật lại; test `tests/licenseGate.test.ts` ghi cách bật.
 - `appId` `com.baocaonhom.app`, tên file chạy `bao-cao-nhom`, thư mục dữ liệu `BaoCaoNhom`, tên sản phẩm "Báo Cáo Nhóm" và kho phát hành `minesan191132/zca-scraping` đã nằm trong gói khách: không đổi.
 - Không chạy `bot:watch` hay bot khác của hệ thống đầy đủ cùng lúc với bản cài trên một máy: cả hai cùng điều khiển một Zalo Desktop qua cổng 9222.
 - Đây là repo công khai. Mọi tên trường, tên người, id bộ trong test và tài liệu là **tên giả**. Không thêm tên thật, đường dẫn máy thật, khóa hay dữ liệu cào được.
