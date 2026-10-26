@@ -1,0 +1,9 @@
+{
+    "targets": ["Test BC Kỹ thuật", "BÁO CÁO KỸ THUẬT - AI", "LC_BìnhMinh_BTAN", "LC_SaoMai1_TĐ", "LC_HảiĐăng_BTAN", "LC_ĐồngXanh_Q5"],
+    "reportSets": [
+        { "id": "NguoiA", "reports": ["netsupport", "loa", "internet", "mayTinh", "dien", "cleaning", "attendance", "attendanceStart", "attendanceEnd"] },
+        { "id": "NguoiC", "reporterName": "Chưa phân công", "reports": ["shiftStart", "shiftEnd"] },
+        { "id": "NguoiB", "reports": ["leave", "maintenance", "internetSpeed", "minutes"] }
+    ],
+    "vision": { "leave": { "groups": ["Test BC Kỹ thuật", "BÁO CÁO KỸ THUẬT - AI"] } }
+}

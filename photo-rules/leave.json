@@ -1,0 +1,31 @@
+{
+    "id": "leave",
+    "version": 3,
+    "title": "Bảng nghỉ phép đã duyệt",
+    "nhanRa": "Ảnh bảng \"KỸ THUẬT NGHỈ PHÉP ĐÃ DUYỆT\" của Tin Học Đại Dương: có logo, các dòng Nhân viên báo cáo, Bộ phận, Ngày báo cáo, rồi bảng nhiều cột STT, HỌ TÊN, SỐ NGÀY, TỪ (giờ, thứ, ngày), ĐẾN (giờ, thứ, ngày), LÝ DO, ĐÚNG QĐ, XẾP LOẠI, GHI CHÚ và bảng chú giải thống kê bên dưới.",
+    "soLuongMoiBo": { "toiThieu": 1, "toiDa": 5 },
+    "truong": [
+        { "ten": "ngayBaoCao", "kieu": "ngay", "goiY": "Ngày ghi ở \"Ngày báo cáo\" trên đầu bảng, đổi sang YYYY-MM-DD." },
+        { "ten": "nguoiBaoCao", "kieu": "chu", "goiY": "Tên sau \"Nhân viên báo cáo:\"." },
+        { "ten": "boPhan", "kieu": "chu", "goiY": "Tên sau \"Bộ phận:\"." },
+        {
+            "ten": "dong",
+            "kieu": "danh_sach",
+            "batBuoc": true,
+            "goiY": "Mỗi dòng người nghỉ trong bảng chính, từ trên xuống dưới. KHÔNG đọc bảng chú giải thống kê ở dưới. Bỏ qua dòng trống. Nhiều ảnh có thể là CÙNG MỘT bảng (chụp lại, gửi lặp) hoặc các phần nối tiếp nhau: mỗi kỳ nghỉ của một người chỉ ghi MỘT dòng, không lặp lại dòng đã ghi từ ảnh trước (cùng họ tên và cùng ngày từ - đến là một dòng); chỉ thêm dòng của người hoặc kỳ nghỉ chưa có.",
+            "phanTu": [
+                { "ten": "hoTen", "kieu": "chu", "batBuoc": true, "goiY": "Họ tên đầy đủ trong cột HỌ TÊN. Chép đúng từng chữ và từng dấu như in trong ảnh, không tự sửa hay đoán tên." },
+                { "ten": "tuGio", "kieu": "chu", "batBuoc": true, "goiY": "Giờ bắt đầu ở cột TỪ - GIỜ, dạng H:mm, ví dụ 8:00 hoặc 13:30." },
+                { "ten": "tuThu", "kieu": "so", "min": 1, "max": 7, "goiY": "Số ở cột TỪ - THỨ (CN là 1, thứ hai là 2, ..., thứ bảy là 7)." },
+                { "ten": "tuNgay", "kieu": "ngay_in", "batBuoc": true, "goiY": "Ngày in ở cột TỪ - NGÀY, chép nguyên văn từng ký tự như trên ảnh, ví dụ 10/05/2026. KHÔNG đổi thứ tự các số, KHÔNG đổi sang dạng khác, KHÔNG đoán đâu là ngày đâu là tháng: chương trình sẽ tự đổi." },
+                { "ten": "denGio", "kieu": "chu", "batBuoc": true, "goiY": "Giờ kết thúc ở cột ĐẾN - GIỜ, dạng H:mm, ví dụ 18:00." },
+                { "ten": "denThu", "kieu": "so", "min": 1, "max": 7, "goiY": "Số ở cột ĐẾN - THỨ, chép đúng số in trong ảnh (kể cả khi nhìn lạ); để null nếu ô trống." },
+                { "ten": "denNgay", "kieu": "ngay_in", "batBuoc": true, "goiY": "Ngày in ở cột ĐẾN - NGÀY, chép nguyên văn như TỪ - NGÀY (từng ký tự, không đổi thứ tự số, không đổi dạng)." },
+                { "ten": "soNgay", "kieu": "so", "min": 0, "max": 366, "goiY": "Số ở cột SỐ NGÀY." },
+                { "ten": "lyDo", "kieu": "chu", "goiY": "Chữ ở cột LÝ DO." }
+            ]
+        }
+    ],
+    "docLanHai": "khi_tin_cay_thap",
+    "nguongTinCay": "vua"
+}

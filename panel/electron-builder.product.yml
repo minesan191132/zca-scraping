@@ -1,0 +1,49 @@
+# Bản bán "Báo Cáo Nhóm": chỉ chứa panel và các CLI đã gộp (`../dist`, dựng bằng `npm run build:dist` ở thư mục gốc).
+# KHÔNG đóng `default-project.json` (nó ghi đường dẫn máy của tác giả) và không đóng mã nguồn, tài liệu, test, `.claude`, `data`.
+# `appId` và tên thư mục dữ liệu (%LOCALAPPDATA%\BaoCaoNhom, đặt ở src/main/index.ts) KHÓ ĐỔI sau khi có khách cài: đổi `appId` thì
+# bản mới cài cạnh bản cũ, đổi tên thư mục dữ liệu thì dữ liệu khách mồ côi. Không có chữ "Zalo" hay "Beta" trong các giá trị này.
+appId: com.baocaonhom.app
+productName: Báo Cáo Nhóm
+directories:
+  buildResources: build
+  output: dist-product
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!docs/*'
+  - '!scripts/*'
+  - '!tests/*'
+  - '!kit/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!vitest.config.*'
+  - '!svelte.config.mjs'
+  - '!components.json'
+  - '!{.eslintcache,eslint.config.mjs,.prettierignore,.prettierrc.yaml,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!electron-builder*.yml'
+extraResources:
+  - from: ../dist
+    to: dist
+asarUnpack:
+  - resources/**
+win:
+  executableName: bao-cao-nhom
+  target:
+    - target: nsis
+      arch: x64
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  artifactName: bao-cao-nhom-${version}-setup.${ext}
+  shortcutName: Báo Cáo Nhóm
+  uninstallDisplayName: Báo Cáo Nhóm
+  createDesktopShortcut: always
+npmRebuild: false
+# Kho phát hành CÔNG KHAI (khách tải không cần token). Kho chỉ chứa file cài và latest.yml, không mã nguồn. KHÔNG đặt publisherName (bản chưa ký số).
+# Token đẩy bản phát hành chỉ ở biến môi trường GH_TOKEN trên máy tác giả, không ghi vào file nào.
+publish:
+  - provider: github
+    owner: minesan191132
+    repo: zca-scraping

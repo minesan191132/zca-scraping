@@ -1,0 +1,588 @@
+[
+  {
+    "path": "cdpPort",
+    "unit": null,
+    "default": 9222,
+    "defaultLabel": null,
+    "readers": ["bot:watch", "bot:runner", "bot:chat", "bot:scrape"],
+    "note_vi_original": "Cổng gỡ lỗi mà Zalo Desktop được mở ra để bot điều khiển."
+  },
+  {
+    "path": "zaloExePath",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "tự dò",
+    "readers": ["bot:watch", "bot:runner", "bot:chat", "bot:scrape"],
+    "note_vi_original": "Đường dẫn Zalo.exe; chỉ đặt tay khi tự dò sai."
+  },
+  {
+    "path": "autoLaunchZalo",
+    "unit": null,
+    "default": true,
+    "defaultLabel": null,
+    "readers": ["bot:watch", "bot:runner", "bot:chat", "bot:scrape"],
+    "note_vi_original": "Tự tắt và mở lại Zalo khi chưa có cổng gỡ lỗi."
+  },
+  {
+    "path": "dataDir",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "./data",
+    "readers": ["bot:watch", "bot:runner", "bot:chat", "bot:scrape"],
+    "note_vi_original": "Nơi lưu tin đã cào và các tệp trạng thái."
+  },
+  {
+    "path": "statusExportDir",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "./data/export/trang-thai",
+    "readers": ["bot:runner", "runner:once", "bot:total", "total:once", "fill:status-reports"],
+    "note_vi_original": "Thư mục gốc chứa báo cáo trạng thái, mỗi ngày ở <gốc>/<yyMM>/<yyMMdd>/. Đường dẫn tuyệt đối."
+  },
+  {
+    "path": "excelMaxColumnWidth",
+    "unit": "ký tự",
+    "default": 50,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "runner:once", "bot:total", "total:once", "fill:status-reports", "fill:tech-reports"],
+    "note_vi_original": "Cột của file báo cáo tự nới theo chữ trong dòng dữ liệu tới tối đa bấy nhiêu ký tự (không hẹp hơn mẫu); dài hơn thì chữ xuống dòng, không mất chữ."
+  },
+  {
+    "path": "reportSets",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "một bộ NguyenVanA với đủ 8 loại",
+    "readers": [
+      "bot:runner",
+      "runner:once",
+      "bot:total",
+      "total:once",
+      "fill:status-reports",
+      "extract:reports"
+    ],
+    "note_vi_original": "Các bộ báo cáo theo người phụ trách: id (tên thư mục) và reports (mã nội bộ). Không có mặc định; sai thì bộ/mục đó bị tắt và báo lỗi."
+  },
+  {
+    "path": "targets",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "theo máy bạn",
+    "readers": ["bot:watch", "bot:runner", "bot:chat", "bot:scrape"],
+    "note_vi_original": "Tên nhóm đúng như thanh bên Zalo; chỉ nhóm ở đây mới được theo dõi."
+  },
+  {
+    "path": "groupAliases",
+    "unit": null,
+    "default": {},
+    "defaultLabel": null,
+    "readers": ["bot:runner", "bot:chat"],
+    "note_vi_original": "Nhóm thử được đọc như một nhóm trường thật khi trích xuất (chỉ để thử; dòng nằm trong Excel thật)."
+  },
+  {
+    "path": "recoveryIgnoreTargets",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "bot test",
+    "readers": ["bot:runner", "recover:missing"],
+    "note_vi_original": "Nhóm không gửi báo cáo buổi dạy; khôi phục không cào lại chúng."
+  },
+  {
+    "path": "sinceTs",
+    "unit": "mốc giờ",
+    "default": null,
+    "defaultLabel": "06:00 hôm nay",
+    "readers": ["bot:scrape", "recover:missing"],
+    "note_vi_original": "Chỉ giữ tin từ mốc này; tính một lần lúc bot khởi động."
+  },
+  {
+    "path": "untilTs",
+    "unit": "mốc giờ",
+    "default": null,
+    "defaultLabel": null,
+    "readers": ["bot:scrape"],
+    "note_vi_original": "Chỉ giữ tin đến mốc này (bộ lọc kết quả)."
+  },
+  {
+    "path": "targetMessageCount",
+    "unit": "tin",
+    "default": 2000,
+    "defaultLabel": null,
+    "readers": ["bot:scrape", "bot:runner"],
+    "note_vi_original": "Trần an toàn số tin mỗi nhóm mỗi lần cào."
+  },
+  {
+    "path": "scrollDelayMs",
+    "unit": "ms",
+    "default": {
+      "min": 500,
+      "max": 1200
+    },
+    "defaultLabel": null,
+    "readers": ["bot:scrape", "bot:runner"],
+    "note_vi_original": "Nghỉ ngẫu nhiên giữa hai bước cuộn."
+  },
+  {
+    "path": "watch.heartbeatSeconds",
+    "unit": "giây",
+    "default": 30,
+    "defaultLabel": null,
+    "readers": ["bot:watch", "bot:runner"],
+    "note_vi_original": "Bao lâu ghi nhịp tim (cũng là nhịp tim của bot:runner)."
+  },
+  {
+    "path": "watch.deadAfterSeconds",
+    "unit": "giây",
+    "default": 90,
+    "defaultLabel": null,
+    "readers": ["bot:watch", "bot:runner", "bot:chat"],
+    "note_vi_original": "Quá bấy nhiêu giây không có nhịp tim thì coi bot đã chết."
+  },
+  {
+    "path": "watch.minBlindSeconds",
+    "unit": "giây",
+    "default": 60,
+    "defaultLabel": null,
+    "readers": ["bot:watch", "bot:runner"],
+    "note_vi_original": "Khoảng mù ngắn hơn giá trị này bị coi là nhiễu khởi động."
+  },
+  {
+    "path": "runner.quietSeconds",
+    "unit": "giây",
+    "default": 120,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Hàng chờ yên lặng bấy nhiêu giây rồi mới cào."
+  },
+  {
+    "path": "runner.maxWaitSeconds",
+    "unit": "giây",
+    "default": 600,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Trần chờ tính từ nhóm đầu tiên vào hàng chờ."
+  },
+  {
+    "path": "runner.pollSeconds",
+    "unit": "giây",
+    "default": 5,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Bao lâu xem lại hàng chờ một lần."
+  },
+  {
+    "path": "runner.dirtyCheckSeconds",
+    "unit": "giây",
+    "default": 60,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Bao lâu kiểm báo cáo chưa dựng vào Excel."
+  },
+  {
+    "path": "runner.dirtyRetrySeconds",
+    "unit": "giây",
+    "default": 300,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Thử lại một buổi dựng lỗi sau bấy nhiêu giây."
+  },
+  {
+    "path": "runner.watchWarmupSeconds",
+    "unit": "giây",
+    "default": 90,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Không đụng vào Zalo trong bấy nhiêu giây sau khi bot:watch khởi động."
+  },
+  {
+    "path": "runner.maxConsecutiveFailures",
+    "unit": "vòng",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Bấy nhiêu vòng lỗi liên tiếp thì runner ngừng tự thử."
+  },
+  {
+    "path": "runner.maxScrapeAttempts",
+    "unit": "lần",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "bot:scrape"],
+    "note_vi_original": "Nhóm cào lỗi ở lại hàng chờ, thử tối đa bấy nhiêu lần rồi bỏ."
+  },
+  {
+    "path": "watch.probeSeconds",
+    "unit": "giây",
+    "default": 30,
+    "defaultLabel": null,
+    "readers": ["bot:watch"],
+    "note_vi_original": "Kiểm tra Zalo còn trả lời cổng gỡ lỗi không; hai lần liên tiếp không trả lời thì tự tắt, mở lại Zalo và gắn lại."
+  },
+  {
+    "path": "watch.silenceRestartMinutes",
+    "unit": "phút",
+    "default": 0,
+    "defaultLabel": null,
+    "readers": ["bot:watch"],
+    "note_vi_original": "Không nhận khung WebSocket nào quá bấy nhiêu phút thì tự khởi động lại Zalo; 0 là tắt."
+  },
+  {
+    "path": "watch.reconnectMaxSeconds",
+    "unit": "giây",
+    "default": 300,
+    "defaultLabel": null,
+    "readers": ["bot:watch"],
+    "note_vi_original": "Thời gian chờ tối đa giữa hai lần nối lại sau khi mất kết nối."
+  },
+  {
+    "path": "runner.errorRetryMinutes",
+    "unit": "phút",
+    "default": 10,
+    "defaultLabel": null,
+    "readers": ["bot:runner"],
+    "note_vi_original": "Sau khi ngừng vì lỗi liên tiếp, thử lại sau bấy nhiêu phút nếu còn việc; 0 là ngừng hẳn."
+  },
+  {
+    "path": "runner.queueKeepDays",
+    "unit": "ngày",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "bot:scrape"],
+    "note_vi_original": "Giữ file sự kiện của hàng chờ bấy nhiêu ngày (ngoài hôm nay); cũ hơn thì xóa sau mỗi lần cào."
+  },
+  {
+    "path": "recovery.marginMinutes",
+    "unit": "phút",
+    "default": 5,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "recover:missing"],
+    "note_vi_original": "Cào lại từ trước lúc watch chết bấy nhiêu phút."
+  },
+  {
+    "path": "chat.pollSeconds",
+    "unit": "giây",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["bot:chat"],
+    "note_vi_original": "Bao lâu kiểm hộp thư chat một lần."
+  },
+  {
+    "path": "chat.heartbeatSeconds",
+    "unit": "giây",
+    "default": 30,
+    "defaultLabel": null,
+    "readers": ["bot:chat"],
+    "note_vi_original": "Nhịp tim của bot chat."
+  },
+  {
+    "path": "chat.skipBackoffSeconds",
+    "unit": "giây",
+    "default": 45,
+    "defaultLabel": null,
+    "readers": ["bot:chat"],
+    "note_vi_original": "Sau một lần gửi bị hoãn, không đụng vào Zalo lại trong bấy nhiêu giây."
+  },
+  {
+    "path": "chat.sentLedgerMinutes",
+    "unit": "phút",
+    "default": 10,
+    "defaultLabel": null,
+    "readers": ["bot:chat", "bot:watch"],
+    "note_vi_original": "Giữ sổ câu bot vừa gửi bấy nhiêu phút."
+  },
+  {
+    "path": "chat.echoWindowSeconds",
+    "unit": "giây",
+    "default": 120,
+    "defaultLabel": null,
+    "readers": ["bot:watch"],
+    "note_vi_original": "Cửa sổ nhận ra tin dội lại của bot."
+  },
+  {
+    "path": "chat.restorePreviousConversation",
+    "unit": "true/false",
+    "default": false,
+    "defaultLabel": null,
+    "readers": ["bot:chat"],
+    "note_vi_original": "Sau khi trả lời, quay về nhóm Zalo đang mở trước đó (true) hay ở lại nhóm vừa trả lời (false)."
+  },
+  {
+    "path": "sessions.chieuFromHour",
+    "unit": "giờ",
+    "default": 12,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "extract:reports", "recover:missing"],
+    "note_vi_original": "Giờ bắt đầu buổi chiều."
+  },
+  {
+    "path": "sessions.toiFromHour",
+    "unit": "giờ",
+    "default": 18,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "extract:reports", "recover:missing"],
+    "note_vi_original": "Giờ bắt đầu buổi tối."
+  },
+  {
+    "path": "phases.morningEndFromHour",
+    "unit": "giờ",
+    "default": 9,
+    "defaultLabel": null,
+    "readers": ["extract:reports", "fill:report", "fill:status-reports"],
+    "note_vi_original": "Giờ bắt đầu \"cuối buổi sáng\"."
+  },
+  {
+    "path": "phases.afternoonStartFromHour",
+    "unit": "giờ",
+    "default": 12.5,
+    "defaultLabel": null,
+    "readers": ["extract:reports", "fill:report", "fill:status-reports"],
+    "note_vi_original": "Giờ bắt đầu \"đầu buổi chiều\"."
+  },
+  {
+    "path": "phases.afternoonEndFromHour",
+    "unit": "giờ",
+    "default": 15,
+    "defaultLabel": null,
+    "readers": ["extract:reports", "fill:report", "fill:status-reports"],
+    "note_vi_original": "Giờ bắt đầu \"cuối buổi chiều\"."
+  },
+  {
+    "path": "phases.morningStartFromHour",
+    "unit": "giờ",
+    "default": 17.5,
+    "defaultLabel": null,
+    "readers": ["extract:reports", "fill:report", "fill:status-reports"],
+    "note_vi_original": "Giờ bắt đầu \"đầu buổi sáng NGÀY MAI\" (wrap qua nửa đêm)."
+  },
+  {
+    "path": "total.windowStartHour",
+    "unit": "giờ",
+    "default": 6.5,
+    "defaultLabel": null,
+    "readers": ["bot:total", "total:once"],
+    "note_vi_original": "Giờ bắt đầu khung dữ liệu của mọi đợt báo cáo tổng; tin gửi trước mốc này không được tính."
+  },
+  {
+    "path": "total.morningHour",
+    "unit": "giờ",
+    "default": 9,
+    "defaultLabel": null,
+    "readers": ["bot:total", "total:once"],
+    "note_vi_original": "Giờ chạy đợt sáng, cũng là cuối khung dữ liệu của đợt."
+  },
+  {
+    "path": "total.afternoonHour",
+    "unit": "giờ",
+    "default": 15,
+    "defaultLabel": null,
+    "readers": ["bot:total", "total:once"],
+    "note_vi_original": "Giờ chạy đợt chiều (khung dữ liệu cộng dồn từ windowStartHour)."
+  },
+  {
+    "path": "total.waitMaxMinutes",
+    "unit": "phút",
+    "default": 10,
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Đợi runner rảnh tối đa bấy nhiêu phút kể từ giờ đợt, rồi vẫn xuất kèm cảnh báo."
+  },
+  {
+    "path": "total.refreshEveryMinutes",
+    "unit": "phút",
+    "default": 10,
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Lần xuất đầu thiếu dữ liệu thì xuất lại mỗi bấy nhiêu phút (hoặc ngay khi hàng chờ rỗng)."
+  },
+  {
+    "path": "total.refreshUntilMinutes",
+    "unit": "phút",
+    "default": 60,
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Ngừng xuất lại sau bấy nhiêu phút kể từ giờ đợt."
+  },
+  {
+    "path": "total.pollSeconds",
+    "unit": "giây",
+    "default": 5,
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Bao lâu xem lại một lần xem đã tới giờ đợt chưa."
+  },
+  {
+    "path": "print.enabled",
+    "unit": null,
+    "default": false,
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Bật in tự động ra máy in mặc định sau lần xuất đầu của mỗi đợt; mặc định tắt cho tới khi máy in được kiểm chứng."
+  },
+  {
+    "path": "print.centerPage",
+    "unit": null,
+    "default": true,
+    "defaultLabel": null,
+    "readers": ["bot:total", "total:once"],
+    "note_vi_original": "Khi in, căn nội dung giữa trang theo chiều ngang và đặt lề trái bằng lề phải (lấy lề lớn hơn); chỉ đổi bản in, không sửa file xuất."
+  },
+  {
+    "path": "print.sets",
+    "unit": null,
+    "default": [],
+    "defaultLabel": null,
+    "readers": ["bot:total"],
+    "note_vi_original": "Chỉ in file của các bộ báo cáo này (id như trong reportSets); để [] là in mọi bộ. Lệnh tay total:once --print không bị giới hạn."
+  },
+  {
+    "path": "print.maxPagesPerFile",
+    "unit": "trang",
+    "default": 5,
+    "defaultLabel": null,
+    "readers": ["bot:total", "total:once"],
+    "note_vi_original": "Mỗi file in tối đa bấy nhiêu trang đầu; nhiều hơn thì cắt và ghi cảnh báo."
+  },
+  {
+    "path": "vision.enabled",
+    "unit": "true/false",
+    "default": false,
+    "defaultLabel": null,
+    "readers": ["bot:runner", "today"],
+    "note_vi_original": "Bật việc đọc ảnh nghỉ phép tự động trong chu trình runner (gọi agent, tốn hạn mức). Tắt thì không gọi agent; các lệnh photos:* chạy tay luôn chạy được."
+  },
+  {
+    "path": "vision.reader",
+    "unit": null,
+    "default": "openrouter",
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Cách đọc ảnh; hiện chỉ có openrouter (gọi API OpenRouter, khoá OPENROUTER_API_KEY trong .env hoặc biến môi trường)."
+  },
+  {
+    "path": "vision.model",
+    "unit": null,
+    "default": "google/gemini-2.5-flash",
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Model OpenRouter cho lần đọc thứ nhất (phải đọc được ảnh)."
+  },
+  {
+    "path": "vision.secondModel",
+    "unit": null,
+    "default": "google/gemini-2.5-flash",
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Model OpenRouter cho lần đọc thứ hai độc lập; đặt khác lần một để hai lần ít sai giống nhau."
+  },
+  {
+    "path": "vision.timeoutSeconds",
+    "unit": "giây",
+    "default": 180,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Chờ tối đa bấy nhiêu giây cho một lần gọi model đọc một bộ ảnh."
+  },
+  {
+    "path": "vision.prefilter.enabled",
+    "unit": null,
+    "default": true,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Bật bộ lọc OCR: OCR chạy trên máy xếp từng ảnh vào loại (nghỉ phép, tốc độ, biên bản) và chỉ ảnh cần mới gửi cho agent; tắt thì gửi cả bộ ảnh."
+  },
+  {
+    "path": "vision.prefilter.minImages",
+    "unit": "ảnh",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Bộ có ít ảnh hơn mức này thì không OCR, gọi thẳng agent."
+  },
+  {
+    "path": "vision.prefilter.concurrency",
+    "unit": "luồng",
+    "default": 2,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Số luồng OCR chạy song song (mỗi luồng tốn khoảng 100 đến 200 MB bộ nhớ)."
+  },
+  {
+    "path": "vision.leave.dateFormat",
+    "unit": null,
+    "default": "MDY",
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "photos:golden"],
+    "note_vi_original": "Thứ tự các số trong ngày TỪ - ĐẾN in trên bảng nghỉ phép: MDY là tháng/ngày/năm (10/05/2026 là 5 tháng 10), DMY là ngày/tháng/năm. Agent chỉ chép nguyên văn ngày in, chương trình tự đổi theo khoá này nên không còn đọc đảo ngày lúc đúng lúc sai."
+  },
+  {
+    "path": "vision.maxBundlesPerRun",
+    "unit": "bộ",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto"],
+    "note_vi_original": "Mỗi lần chạy (photos:read hoặc một chu trình runner) đọc tối đa bấy nhiêu bộ (chặn tốn hạn mức)."
+  },
+  {
+    "path": "vision.bundle.gapMinutes",
+    "unit": "phút",
+    "default": 3,
+    "defaultLabel": null,
+    "readers": ["photos:bundle", "photos:auto"],
+    "note_vi_original": "Hai ảnh liên tiếp của cùng người cách nhau không quá bấy nhiêu phút thì cùng một bộ."
+  },
+  {
+    "path": "vision.bundle.textWindowMinutes",
+    "unit": "phút",
+    "default": 10,
+    "defaultLabel": null,
+    "readers": ["photos:bundle", "photos:auto"],
+    "note_vi_original": "Tin chữ của cùng người trong khoảng bấy nhiêu phút quanh bộ được đính kèm."
+  },
+  {
+    "path": "vision.leave.groups",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "[\"bot test\"]",
+    "readers": ["photos:bundle", "photos:auto", "bot:total"],
+    "note_vi_original": "Nhóm được đọc ảnh nghỉ phép (tên như trong targets); ảnh ở nhóm khác không bao giờ bị đọc."
+  },
+  {
+    "path": "vision.leave.senders",
+    "unit": null,
+    "default": null,
+    "defaultLabel": "[] (mọi người)",
+    "readers": ["photos:bundle", "photos:auto"],
+    "note_vi_original": "Chỉ đọc ảnh của các người gửi này; để trống là mọi người trong các nhóm trên."
+  },
+  {
+    "path": "vision.leave.settleSeconds",
+    "unit": "giây",
+    "default": 20,
+    "defaultLabel": null,
+    "readers": ["photos:bundle", "photos:auto"],
+    "note_vi_original": "Bộ ảnh nghỉ phép đóng sau khi yên bấy nhiêu giây kể từ ảnh cuối; phải nhỏ hơn runner.quietSeconds."
+  },
+  {
+    "path": "vision.leave.lookbackDays",
+    "unit": "ngày",
+    "default": 60,
+    "defaultLabel": null,
+    "readers": ["fill:leave-report", "bot:total", "leave:show"],
+    "note_vi_original": "Tìm ảnh nghỉ phép trong bấy nhiêu ngày gần nhất khi dựng file."
+  },
+  {
+    "path": "vision.leave.maxPastDays",
+    "unit": "ngày",
+    "default": 7,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "fill:leave-report", "bot:total", "leave:show"],
+    "note_vi_original": "Ngày bắt đầu nghỉ không sớm hơn ngày gửi ảnh quá bấy nhiêu ngày, nếu không dòng đó chờ xem."
+  },
+  {
+    "path": "vision.leave.maxFutureDays",
+    "unit": "ngày",
+    "default": 120,
+    "defaultLabel": null,
+    "readers": ["photos:read", "photos:auto", "fill:leave-report", "bot:total", "leave:show"],
+    "note_vi_original": "Ngày bắt đầu nghỉ không muộn hơn ngày gửi ảnh quá bấy nhiêu ngày, nếu không dòng đó chờ xem."
+  }
+]

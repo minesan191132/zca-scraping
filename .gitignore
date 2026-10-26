@@ -1,0 +1,39 @@
+node_modules/
+dist/
+
+# Runtime output — scraped messages, never commit
+/data/
+
+# Extractor output — never commit
+/output/
+
+# Plan-execution scratch (ledger, briefs)
+/.superpowers/
+
+# Isolated worktrees for in-progress features
+/.worktrees/
+
+# npm
+npm-debug.log*
+
+# editor/OS
+.DS_Store
+
+.ua/
+
+# Secrets — DB credentials
+.env
+.env.*
+!.env.example
+
+.claude
+# Dữ liệu thật của khách (tên người trong ảnh), không commit; mẫu là photo-golden/*.example.json
+/photo-golden/leave.json
+
+# Cấu hình riêng của từng máy (nhóm, người phụ trách); mẫu là config.example.json
+/config.json
+
+# khoa rieng cap giay phep: khong bao gio vao repo
+*.pem
+license-private*
+/license.json

@@ -1,0 +1,10 @@
+{
+    "version": 1,
+    "dryRun": false,
+    "limits": {
+        "maxRepliesPerMinute": 6,
+        "maxReplyDelaySeconds": 180,
+        "cooldownSecondsPerRule": 30
+    },
+    "groups": {}
+}

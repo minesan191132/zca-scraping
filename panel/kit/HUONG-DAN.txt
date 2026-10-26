@@ -1,0 +1,52 @@
+GÓI TRIỂN KHAI ZALO BOTS
+========================
+
+Gói này gồm:
+  zca-scrape-message\   mã nguồn các bot (đọc tin Zalo, dựng báo cáo Excel) kèm mẫu Excel
+  Zalo Bots\            app điều khiển (xem trạng thái, khởi động, dừng, nhật ký, cấu hình)
+  Cai-dat.cmd           script cài đặt, chạy một lần trên máy mới
+  VERSION.txt           bản mã nguồn dùng để dựng gói
+
+Gói KHÔNG chứa: file .env thật (khóa và mật khẩu), tin nhắn đã cào, báo cáo đã xuất.
+
+Máy cần có sẵn
+--------------
+  - Windows 10 trở lên
+  - Zalo Desktop, đã đăng nhập tài khoản cần lấy dữ liệu
+  - Microsoft Excel (báo cáo được dựng bằng Excel)
+  - Mạng internet khi cài đặt (tải thư viện)
+  - Node.js 22 trở lên (script cài đặt hỏi và cài giúp bằng winget nếu thiếu)
+  - SQL Server, chỉ khi dùng bước đồng bộ cơ sở dữ liệu
+
+Cài đặt (làm một lần)
+---------------------
+  1. Giải nén cả gói vào một thư mục, ví dụ D:\ZaloBots. Không đổi tên hai thư mục bên trong,
+     và giữ "Zalo Bots" nằm cạnh "zca-scrape-message" thì app mới tự tìm thấy dự án.
+  2. Bấm đúp Cai-dat.cmd. Script sẽ:
+       - kiểm tra Node.js 22 trở lên
+       - chạy npm install trong zca-scrape-message
+       - tạo file .env và hỏi khóa OPENROUTER_API_KEY
+       - kiểm tra cấu hình, mẫu Excel, Zalo Desktop, Excel
+       - tạo lối tắt "Zalo Bots" trên màn hình nền
+  3. Mở zca-scrape-message\config.ts, sửa cho máy này:
+       targets      tên các nhóm Zalo cần theo dõi, đúng như thanh bên của Zalo
+       reportSets   mỗi người phụ trách nhận những báo cáo nào
+  4. Mở Zalo Bots. Lần đầu Zalo sẽ bị đóng và mở lại để bật cổng gỡ lỗi, phiên đăng nhập không mất.
+
+Dùng hằng ngày
+--------------
+  Trong app: trang từng bot có nút Khởi động và Dừng, tab Nhật ký và tab Cấu hình.
+  Trang "Tác vụ" có các việc làm tay như chạy báo cáo hôm nay.
+  Sửa config.ts xong thì khởi động lại bot liên quan.
+
+Cập nhật
+--------
+  Nhận gói mới, giải nén sang thư mục khác, chép lại file .env và config.ts đã sửa, và thư mục data
+  (nếu muốn giữ tin đã cào) vào bản mới.
+
+Khi có lỗi
+----------
+  - App báo "thiếu lệnh" hoặc không thấy dự án: kiểm tra "Zalo Bots" có nằm cạnh "zca-scrape-message" không,
+    hoặc chọn thư mục ở trang Chung.
+  - Bot không chạy: xem tab Nhật ký của bot đó, hoặc chạy trong zca-scrape-message:  npm run watch:status
+  - Windows SmartScreen cảnh báo khi mở app lần đầu vì app chưa ký số: chọn "Thông tin thêm", rồi "Vẫn chạy".

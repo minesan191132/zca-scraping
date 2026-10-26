@@ -1,0 +1,7 @@
+{
+    "targets": ["Tên nhóm Zalo 1", "Tên nhóm Zalo 2"],
+    "reportSets": [
+        { "id": "Tên người phụ trách", "reporterName": "Họ tên in trên báo cáo", "reports": ["attendanceStart", "attendanceEnd", "shiftStart", "shiftEnd"] }
+    ],
+    "vision": { "leave": { "groups": [] } }
+}
