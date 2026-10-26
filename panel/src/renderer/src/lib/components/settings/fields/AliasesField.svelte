@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Plus from '@lucide/svelte/icons/plus'
-  import Trash from '@lucide/svelte/icons/trash'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { Input } from '$lib/components/ui/input'
   import { Button } from '$lib/components/ui/button'
   import { config } from '$lib/stores/config.svelte'
@@ -73,7 +72,7 @@
         title={t('cfg.delete')}
         onclick={() => remove(i)}
       >
-        <Trash />
+        <Glyph name="trash" class="size-3.5" />
       </Button>
     </div>
   {:else}
@@ -81,7 +80,7 @@
   {/each}
   <div>
     <Button variant="outline" size="sm" onclick={() => pairs.push({ key: '', value: '' })}>
-      <Plus />
+      <Glyph name="plus" class="size-3.5" />
       {t('cfg.addAlias')}
     </Button>
   </div>

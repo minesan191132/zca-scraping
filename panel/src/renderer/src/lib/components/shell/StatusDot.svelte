@@ -2,24 +2,25 @@
   import { cn } from '$lib/utils'
   import type { ShownState } from '$lib/stores/status.svelte'
 
+  // Ô vuông nhỏ màu theo trạng thái. Luôn đứng cạnh chữ nói rõ trạng thái; một mình nó chỉ là trang trí.
   let { state, class: className }: { state: ShownState; class?: string } = $props()
 
   const tone: Record<ShownState, string> = {
-    alive: 'bg-emerald-500',
-    starting: 'bg-amber-500',
-    busy: 'bg-amber-500',
-    warn: 'bg-amber-500',
-    dead: 'bg-red-500',
-    stopped: 'bg-muted-foreground/50',
+    alive: 'bg-alive',
+    starting: 'bg-warn',
+    busy: 'bg-warn',
+    warn: 'bg-warn',
+    dead: 'bg-dead',
+    stopped: 'bg-muted-foreground/45',
     loading: 'bg-muted-foreground/30'
   }
 </script>
 
 <span
   class={cn(
-    'inline-block size-2.5 shrink-0 rounded-full',
+    'inline-block size-2 shrink-0 transition-colors duration-[var(--dur-short)]',
     tone[state],
-    state === 'alive' && 'animate-pulse',
     className
   )}
+  aria-hidden="true"
 ></span>

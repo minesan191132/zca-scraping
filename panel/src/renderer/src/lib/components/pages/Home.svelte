@@ -1,15 +1,12 @@
 <script lang="ts">
-  import Activity from '@lucide/svelte/icons/activity'
-  import CircleAlert from '@lucide/svelte/icons/circle-alert'
-  import Clock from '@lucide/svelte/icons/clock'
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw'
-  import Square from '@lucide/svelte/icons/square'
+  import { fly } from 'svelte/transition'
   import { toast } from 'svelte-sonner'
   import { Button } from '$lib/components/ui/button'
-  import * as Card from '$lib/components/ui/card'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import BotCard from '$lib/components/bot/BotCard.svelte'
   import LicenseCard from '$lib/components/shell/LicenseCard.svelte'
   import { t } from '$lib/i18n/index.svelte'
+  import { DUR_SHORT, ms } from '$lib/motion'
   import { project } from '$lib/stores/project.svelte'
   import { status } from '$lib/stores/status.svelte'
 
@@ -26,32 +23,45 @@
 
 <div class="space-y-6">
   {#if project.bundled}<LicenseCard />{/if}
-  <div class="flex items-center justify-between">
-    <p class="text-sm text-muted-foreground">
-      {t(project.bundled ? 'sub.homeBundled' : 'sub.home')}
-    </p>
-    <Button variant="outline" size="sm" onclick={refresh}><RefreshCw /> {t('home.refresh')}</Button>
+
+  <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+    <div>
+      <p class="num text-3xl font-semibold leading-none">
+        {#key counts.running}<span class="inline-block" in:fly={{ y: 8, duration: ms(DUR_SHORT) }}
+            >{status.loaded ? counts.running : '…'}</span
+          >{/key}<span class="text-lg font-normal text-muted-foreground"
+          >/{project.botIds.length}</span
+        >
+      </p>
+      <p class="mt-1.5 text-sm text-muted-foreground">{t('tile.bots')}</p>
+    </div>
+    <dl class="flex gap-x-8 text-sm">
+      <div>
+        <dt class="text-xs text-muted-foreground">{t('tile.stopped')}</dt>
+        <dd class="num font-medium">{status.loaded ? counts.stopped : '…'}</dd>
+      </div>
+      <div>
+        <dt class="text-xs text-muted-foreground">{t('tile.problems')}</dt>
+        <dd class={counts.problems > 0 ? 'num font-medium text-dead' : 'num font-medium'}>
+          {status.loaded ? counts.problems : '…'}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-xs text-muted-foreground">{t('tile.lastCheck')}</dt>
+        <dd class="num font-medium">{last}</dd>
+      </div>
+    </dl>
+    <Button variant="outline" size="sm" class="ml-auto" onclick={refresh}>
+      <Glyph name="refresh" class="size-3.5" />
+      {t('home.refresh')}
+    </Button>
   </div>
 
-  <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
-    {#each [{ icon: Activity, value: status.loaded ? counts.running : '…', label: t('tile.bots'), tone: 'text-emerald-600 dark:text-emerald-400' }, { icon: Square, value: status.loaded ? counts.stopped : '…', label: t('tile.stopped'), tone: 'text-muted-foreground' }, { icon: CircleAlert, value: status.loaded ? counts.problems : '…', label: t('tile.problems'), tone: counts.problems > 0 ? 'text-red-600 dark:text-red-400' : 'text-muted-foreground' }, { icon: Clock, value: last, label: t('tile.lastCheck'), tone: 'text-muted-foreground' }] as tile (tile.label)}
-      <Card.Root>
-        <Card.Content>
-          <div class="flex items-center gap-3">
-            <span class="flex size-10 items-center justify-center rounded-lg bg-muted {tile.tone}"
-              ><tile.icon class="size-5" /></span
-            >
-            <div>
-              <p class="text-2xl font-semibold leading-none">{tile.value}</p>
-              <p class="mt-1 text-xs text-muted-foreground">{tile.label}</p>
-            </div>
-          </div>
-        </Card.Content>
-      </Card.Root>
-    {/each}
-  </div>
+  <p class="text-sm text-muted-foreground">
+    {t(project.bundled ? 'sub.homeBundled' : 'sub.home')}
+  </p>
 
-  <div class="grid gap-4 md:grid-cols-2">
+  <div class="space-y-4">
     {#each project.botIds as id (id)}
       <BotCard {id} />
     {/each}

@@ -57,13 +57,13 @@
     <Button variant="outline" size="sm" onclick={() => void config.load()}>{t('cfg.retry')}</Button>
   </div>
 {:else if config.loaded}
-  <p class="mb-4 rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+  <p class="mb-4 rounded-sm bg-warn-soft px-3 py-2 text-xs text-warn">
     {t(project.bundled ? 'cfg.noteBundled' : 'cfg.draftNote', { file: config.overlayFile })}
   </p>
   <div class="space-y-8">
     {#each groups as g (g.group)}
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h3 class="text-sm font-semibold text-muted-foreground">
           {t(`group.${g.group}` as MessageKey)}
         </h3>
         {#each g.paths as p (p)}

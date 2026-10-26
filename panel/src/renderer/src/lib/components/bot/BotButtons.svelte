@@ -1,8 +1,7 @@
 <script lang="ts">
-  import Play from '@lucide/svelte/icons/play'
-  import Square from '@lucide/svelte/icons/square'
   import type { BotId } from '@shared/bots'
   import { Button } from '$lib/components/ui/button'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { startBot, stopBot } from '$lib/actions'
   import { t } from '$lib/i18n/index.svelte'
   import { status } from '$lib/stores/status.svelte'
@@ -23,7 +22,7 @@
       void startBot(id)
     }}
   >
-    <Play />
+    <Glyph name="play" class="size-3.5" />
     {t('card.start')}
   </Button>
   <Button
@@ -36,7 +35,7 @@
       void stopBot(id)
     }}
   >
-    <Square />
+    <Glyph name="stop" class="size-3.5" />
     {t('card.stop')}
   </Button>
 </div>

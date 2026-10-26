@@ -1,59 +1,113 @@
 <script lang="ts">
+  import { fly } from 'svelte/transition'
   import type { BotId } from '@shared/bots'
-  import * as Card from '$lib/components/ui/card'
   import StatusBadge from '$lib/components/shell/StatusBadge.svelte'
   import { botDesc, botName } from '$lib/bot-text'
+  import { t } from '$lib/i18n/index.svelte'
+  import { DUR_SHORT, ms } from '$lib/motion'
   import { headlineOf } from '$lib/status-text'
+  import { logs } from '$lib/stores/logs.svelte'
   import { nav } from '$lib/stores/nav.svelte'
   import { status } from '$lib/stores/status.svelte'
-  import BotButtons from './BotButtons.svelte'
-  import BotIcon from './BotIcon.svelte'
   import { cn } from '$lib/utils'
+  import BotButtons from './BotButtons.svelte'
 
   let { id }: { id: BotId } = $props()
 
   const shown = $derived(status.shown(id))
   const s = $derived(status.of(id))
-  const edge = $derived(
+  const tail = $derived(logs.lines(id).at(-1))
+  const rail = $derived(
     shown === 'alive'
-      ? 'border-l-emerald-500'
+      ? 'bg-alive'
       : shown === 'dead'
-        ? 'border-l-red-500'
+        ? 'bg-dead'
         : shown === 'warn' || shown === 'starting' || shown === 'busy'
-          ? 'border-l-amber-500'
-          : 'border-l-transparent'
+          ? 'bg-warn'
+          : 'bg-border'
   )
+  const busy = $derived(shown === 'starting' || shown === 'busy')
+  const tailTone = {
+    plain: 'text-tail-fg',
+    mark: 'text-tail-mark',
+    error: 'text-tail-error',
+    warn: 'text-tail-warn'
+  }
+
+  const open = (): void => nav.go({ name: 'bot', id, tab: 'status' })
 </script>
 
-<!-- The card is a link to the bot page; the buttons inside stop the click from bubbling up to it. -->
+<!-- Một "làn" cho mỗi bot: vạch trạng thái bên trái, tên, câu trạng thái, và dòng nhật ký mới nhất. Cả làn là liên kết tới trang bot; nút bên trong không để sự kiện nổi lên. -->
 <div
   role="link"
   tabindex="0"
-  class="cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 rounded-xl"
-  onclick={() => nav.go({ name: 'bot', id, tab: 'status' })}
+  class="group relative flex cursor-pointer overflow-hidden rounded-md border bg-card outline-none transition-colors duration-[var(--dur-micro)] hover:border-foreground/25 focus-visible:ring-2 focus-visible:ring-ring"
+  onclick={open}
   onkeydown={(e) => {
-    if (e.key === 'Enter') nav.go({ name: 'bot', id, tab: 'status' })
+    if (e.key === 'Enter') open()
   }}
 >
-  <Card.Root class={cn('border-l-4 transition-shadow hover:shadow-md', edge)}>
-    <Card.Header>
-      <div class="flex items-start gap-3">
+  <span
+    class={cn(
+      'lane-rail w-1 shrink-0 transition-colors duration-[var(--dur-short)]',
+      rail,
+      busy && 'lane-rail-busy'
+    )}
+  ></span>
+  <div class="min-w-0 flex-1 space-y-3 p-4">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <h3 class="min-w-0 text-base font-semibold">{botName(id)}</h3>
+      <code class="text-xs text-muted-foreground">bot:{id}</code>
+      <StatusBadge state={shown} class="ml-auto" />
+    </div>
+    <p class="text-sm text-muted-foreground">{botDesc(id)}</p>
+    <p class="min-h-5 text-sm font-medium">{s ? headlineOf(s, shown) : ''}</p>
+    <div
+      class="flex h-9 items-center overflow-hidden rounded-sm bg-tail-bg px-3 font-mono text-xs text-tail-fg"
+      aria-label={t('card.tail')}
+    >
+      {#key tail?.t}
         <span
-          class="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted text-primary"
+          class={cn('truncate', tail ? tailTone[tail.level] : 'text-tail-dim')}
+          in:fly={{ y: 6, duration: ms(DUR_SHORT) }}
         >
-          <BotIcon {id} class="size-5" />
+          {tail ? tail.text : t('card.tailEmpty')}
         </span>
-        <div class="min-w-0 flex-1">
-          <Card.Title class="truncate">{botName(id)}</Card.Title>
-          <code class="text-xs text-muted-foreground">bot:{id}</code>
-        </div>
-        <StatusBadge state={shown} />
-      </div>
-    </Card.Header>
-    <Card.Content class="space-y-3">
-      <p class="text-sm text-muted-foreground">{botDesc(id)}</p>
-      <p class="min-h-5 text-sm font-medium">{s ? headlineOf(s, shown) : ''}</p>
-      <BotButtons {id} />
-    </Card.Content>
-  </Card.Root>
+      {/key}
+    </div>
+    <BotButtons {id} />
+  </div>
 </div>
+
+<style>
+  .lane-rail {
+    position: relative;
+    overflow: hidden;
+  }
+  /* Khi bot đang khởi động hoặc bận, một vệt sáng chạy dọc thanh trạng thái. Chỉ là chỉ báo trạng thái, hết bận thì dừng. */
+  .lane-rail-busy::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      color-mix(in oklab, var(--background) 70%, transparent),
+      transparent
+    );
+    animation: lane-sweep 1.1s var(--ease-in-out) infinite;
+  }
+  @keyframes lane-sweep {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lane-rail-busy::after {
+      animation: none;
+    }
+  }
+</style>

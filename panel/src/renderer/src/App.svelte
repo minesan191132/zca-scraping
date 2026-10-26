@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount, untrack } from 'svelte'
+  import { fly } from 'svelte/transition'
   import { ModeWatcher, mode } from 'mode-watcher'
   import { toast } from 'svelte-sonner'
   import { Toaster } from '$lib/components/ui/sonner'
@@ -13,6 +14,7 @@
   import SearchBox from '$lib/components/shell/SearchBox.svelte'
   import Sidebar from '$lib/components/shell/Sidebar.svelte'
   import { i18n, t } from '$lib/i18n/index.svelte'
+  import { DUR_SHORT, ms } from '$lib/motion'
   import { config } from '$lib/stores/config.svelte'
   import { logs } from '$lib/stores/logs.svelte'
   import { nav } from '$lib/stores/nav.svelte'
@@ -86,23 +88,27 @@
   <div class="flex h-screen bg-background text-foreground">
     <Sidebar />
     <div class="relative flex min-w-0 flex-1 flex-col">
-      <header class="flex h-14 shrink-0 items-center gap-4 border-b px-6">
+      <header class="flex h-14 shrink-0 items-center gap-4 border-b px-8">
         <h1 class="flex-1 text-lg font-semibold">{page.name === 'bot' ? '' : t(titleKey)}</h1>
         <SearchBox />
       </header>
-      <main class="flex-1 overflow-y-auto px-6 py-6 pb-28">
+      <main class="flex-1 overflow-y-auto px-8 py-7 pb-28">
         <div class="mx-auto max-w-5xl">
-          {#if page.name === 'home'}
-            <Home />
-          {:else if page.name === 'bot'}
-            {#key page.id}
-              <BotPage id={page.id} tab={page.tab} />
-            {/key}
-          {:else if page.name === 'jobs'}
-            <Jobs running={jobRunning} />
-          {:else}
-            <General tab={page.tab} />
-          {/if}
+          {#key page.name}
+            <div in:fly={{ y: 6, duration: ms(DUR_SHORT) }}>
+              {#if page.name === 'home'}
+                <Home />
+              {:else if page.name === 'bot'}
+                {#key page.id}
+                  <BotPage id={page.id} tab={page.tab} />
+                {/key}
+              {:else if page.name === 'jobs'}
+                <Jobs running={jobRunning} />
+              {:else}
+                <General tab={page.tab} />
+              {/if}
+            </div>
+          {/key}
         </div>
       </main>
       <SaveBar />

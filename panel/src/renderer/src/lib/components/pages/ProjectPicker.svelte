@@ -1,5 +1,5 @@
 <script lang="ts">
-  import FolderOpen from '@lucide/svelte/icons/folder-open'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { toast } from 'svelte-sonner'
   import { Button } from '$lib/components/ui/button'
   import { t } from '$lib/i18n/index.svelte'
@@ -19,7 +19,7 @@
 
 <div class="space-y-3">
   {#if !first}
-    <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+    <h3 class="text-sm font-semibold text-muted-foreground">
       {t('project.title')}
     </h3>
     <p class="text-sm text-muted-foreground">{t('project.hint')}</p>
@@ -31,7 +31,7 @@
       <span class="text-sm text-muted-foreground">{t('project.none')}</span>
     {/if}
     <Button variant={first ? 'default' : 'outline'} size="sm" onclick={choose}>
-      <FolderOpen />
+      <Glyph name="folder" class="size-4" />
       {project.dir ? t('project.change') : t('project.choose')}
     </Button>
   </div>

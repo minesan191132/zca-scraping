@@ -1,8 +1,7 @@
 <script lang="ts">
-  import Info from '@lucide/svelte/icons/info'
-  import Save from '@lucide/svelte/icons/save'
-  import TriangleAlert from '@lucide/svelte/icons/triangle-alert'
-  import Undo2 from '@lucide/svelte/icons/undo-2'
+  import { fly } from 'svelte/transition'
+  import { DUR_SHORT, ms } from '$lib/motion'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { toast } from 'svelte-sonner'
   import { BOT_IDS, type BotId } from '@shared/bots'
   import * as AlertDialog from '$lib/components/ui/alert-dialog'
@@ -54,12 +53,15 @@
 </script>
 
 {#if visible}
-  <div class="pointer-events-none absolute inset-x-6 bottom-5 z-20 flex justify-center">
+  <div
+    class="pointer-events-none absolute inset-x-6 bottom-5 z-20 flex justify-center"
+    transition:fly={{ y: 16, duration: ms(DUR_SHORT) }}
+  >
     <div
-      class="pointer-events-auto flex w-full max-w-5xl items-center gap-3 rounded-xl border bg-card px-4 py-3 shadow-lg ring-1 ring-amber-500/30"
+      class="pointer-events-auto flex w-full max-w-5xl items-center gap-3 rounded-md border border-warn/50 bg-card px-4 py-3"
     >
-      <span class="flex items-center gap-2 text-sm font-medium text-amber-700 dark:text-amber-400">
-        {#if errors > 0}<TriangleAlert class="size-4" />{:else}<Info class="size-4" />{/if}
+      <span class="flex items-center gap-2 text-sm font-medium text-warn">
+        <Glyph name={errors > 0 ? 'alert' : 'info'} class="size-4" />
         {errors > 0
           ? t('save.pendingErr', { n: count, e: errors })
           : t('save.pending', { n: count })}
@@ -83,11 +85,11 @@
           toast.info(t('toast.undone'))
         }}
       >
-        <Undo2 />
+        <Glyph name="undo" class="size-3.5" />
         {t('save.undoAll')}
       </Button>
-      <Button size="sm" disabled={errors > 0} onclick={save}
-        ><Save /> {t(project.bundled ? 'save.saveBundled' : 'save.save')}</Button
+      <Button size="sm" disabled={errors > 0} onclick={save}>
+        {t(project.bundled ? 'save.saveBundled' : 'save.save')}</Button
       >
     </div>
   </div>

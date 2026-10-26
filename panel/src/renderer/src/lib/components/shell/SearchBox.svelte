@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Search from '@lucide/svelte/icons/search'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { Input } from '$lib/components/ui/input'
   import { i18n, t } from '$lib/i18n/index.svelte'
   import { config } from '$lib/stores/config.svelte'
@@ -31,12 +31,13 @@
 </script>
 
 <div class="relative w-72">
-  <Search
+  <Glyph
+    name="search"
     class="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
   />
   <Input
     type="search"
-    class="rounded-full pl-9"
+    class="rounded-sm pl-9"
     placeholder={t('cfg.search')}
     bind:value={query}
     onfocus={() => (open = true)}
@@ -45,7 +46,7 @@
   />
   {#if open && query.trim()}
     <div
-      class="absolute right-0 top-full z-30 mt-1 w-96 overflow-hidden rounded-lg border bg-popover text-popover-foreground shadow-lg"
+      class="absolute right-0 top-full z-30 mt-1 w-96 overflow-hidden rounded-md border bg-popover text-popover-foreground"
     >
       {#if results.length === 0}
         <p class="px-3 py-2 text-sm text-muted-foreground">{t('cfg.noResults')}</p>

@@ -28,7 +28,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     title: 'Zalo Bots',
-    backgroundColor: nativeTheme.shouldUseDarkColors ? '#0a0a0a' : '#ffffff',
+    backgroundColor: nativeTheme.shouldUseDarkColors ? '#12141a' : '#f8f6f1',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       contextIsolation: true,

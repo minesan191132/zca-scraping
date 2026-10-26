@@ -1,5 +1,5 @@
 <script lang="ts">
-  import X from '@lucide/svelte/icons/x'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { Input } from '$lib/components/ui/input'
   import { config } from '$lib/stores/config.svelte'
   import { i18n, t } from '$lib/i18n/index.svelte'
@@ -47,12 +47,12 @@
           <span class="break-all">{item}</span>
           <button
             type="button"
-            class="inline-flex size-5 items-center justify-center rounded-full text-muted-foreground transition-colors outline-none hover:bg-background hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+            class="inline-flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors outline-none hover:bg-background hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
             aria-label="{t('cfg.remove')}: {item}"
             title={t('cfg.remove')}
             onclick={() => remove(i)}
           >
-            <X class="size-3" />
+            <Glyph name="x" class="size-3" />
           </button>
         </li>
       {/each}

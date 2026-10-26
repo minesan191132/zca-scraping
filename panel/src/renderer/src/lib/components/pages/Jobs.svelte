@@ -1,8 +1,5 @@
 <script lang="ts">
-  import Printer from '@lucide/svelte/icons/printer'
-  import RefreshCw from '@lucide/svelte/icons/refresh-cw'
-  import FileText from '@lucide/svelte/icons/file-text'
-  import FileOutput from '@lucide/svelte/icons/file-output'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { JOB_MODES, JOB_SLOTS, modeExports, type JobMode, type JobSlot } from '@shared/bots'
   import { Button } from '$lib/components/ui/button'
   import * as Card from '$lib/components/ui/card'
@@ -17,12 +14,6 @@
 
   const uid = $props.id()
   const STORAGE_KEY = 'zbots.jobs'
-  const MODE_ICON = {
-    run: RefreshCw,
-    'run-print': Printer,
-    total: FileText,
-    'total-print': FileOutput
-  }
 
   interface Saved {
     mode: JobMode
@@ -99,7 +90,7 @@
     <Card.Content class="space-y-6">
       <section class="space-y-3">
         <div class="flex items-center justify-between gap-3">
-          <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 class="text-sm font-semibold text-muted-foreground">
             {t('jobs.sets')}
           </h3>
           {#if setIds.length > 1}
@@ -128,14 +119,13 @@
       </section>
 
       <section class="space-y-3">
-        <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+        <h3 class="text-sm font-semibold text-muted-foreground">
           {t('jobs.mode')}
         </h3>
         <div class="grid gap-3 lg:grid-cols-2" role="radiogroup" aria-label={t('jobs.mode')}>
           {#each JOB_MODES as m (m)}
-            {@const Icon = MODE_ICON[m]}
             <label
-              class="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-accent has-checked:border-primary has-checked:bg-accent has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50"
+              class="flex cursor-pointer items-center gap-3 rounded-md border p-3 transition-colors duration-[var(--dur-micro)] hover:bg-accent has-checked:border-primary has-checked:bg-accent has-focus-visible:ring-[3px] has-focus-visible:ring-ring/50"
             >
               <input
                 type="radio"
@@ -148,11 +138,6 @@
                   remember()
                 }}
               />
-              <span
-                class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted text-primary"
-              >
-                <Icon class="size-5" />
-              </span>
               <span class="min-w-0 font-medium">{t(`jobs.mode.${m}.name`)}</span>
             </label>
           {/each}
@@ -161,7 +146,7 @@
 
       {#if modeExports(mode)}
         <section class="space-y-3">
-          <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+          <h3 class="text-sm font-semibold text-muted-foreground">
             {t('jobs.slot')}
           </h3>
           <div class="flex flex-wrap gap-3" role="radiogroup" aria-label={t('jobs.slot')}>
@@ -189,7 +174,7 @@
 
       <div class="flex justify-end">
         <Button disabled={running || needsSets} onclick={() => void run()}>
-          {#if running}<RefreshCw class="animate-spin" />{/if}
+          {#if running}<Glyph name="spinner" class="size-4" />{/if}
           {running ? t('action.running') : t('action.run')}
         </Button>
       </div>
@@ -197,7 +182,7 @@
   </Card.Root>
 
   <div class="space-y-2">
-    <h3 class="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+    <h3 class="text-sm font-semibold text-muted-foreground">
       {t('jobs.log')}
     </h3>
     <LogView channel="jobs" />

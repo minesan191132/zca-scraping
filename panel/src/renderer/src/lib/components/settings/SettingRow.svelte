@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Undo2 from '@lucide/svelte/icons/undo-2'
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { Badge } from '$lib/components/ui/badge'
   import { Button } from '$lib/components/ui/button'
   import { config } from '$lib/stores/config.svelte'
@@ -61,36 +61,30 @@
 {#if setting}
   <div
     data-path={path}
-    class="grid gap-x-6 gap-y-3 rounded-lg border bg-card p-4 text-card-foreground transition-colors {stacked
+    class="grid gap-x-6 gap-y-3 rounded-md border bg-card p-4 text-card-foreground transition-colors duration-[var(--dur-short)] {stacked
       ? 'grid-cols-1'
       : 'grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,24rem)]'} {error
       ? 'border-destructive'
       : dirty
-        ? 'border-amber-300 dark:border-amber-500/50'
+        ? 'border-warn/60'
         : ''}"
   >
     <div class="flex min-w-0 flex-col gap-1">
       <div class="flex flex-wrap items-center gap-2">
         <span class="font-medium">{i18n.settingLabel(path)}</span>
         {#if dirty}
-          <Badge
-            variant="secondary"
-            class="bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300"
-          >
+          <Badge variant="secondary" class="bg-warn-soft text-warn">
             {t('cfg.unsaved')}
           </Badge>
         {:else if differs}
-          <Badge
-            variant="secondary"
-            class="bg-sky-100 text-sky-800 dark:bg-sky-500/20 dark:text-sky-300"
-          >
+          <Badge variant="secondary" class="bg-secondary text-secondary-foreground">
             {t('cfg.differs')}
           </Badge>
         {/if}
       </div>
       <p class="text-sm text-muted-foreground">{i18n.settingNote(path, setting.note)}</p>
       <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-        <code class="rounded bg-muted px-1.5 py-0.5 font-mono">{path}</code>
+        <code class="rounded-sm bg-muted px-1.5 py-0.5 font-mono">{path}</code>
         <span>{t('cfg.defaultIs', { v: defaultText(setting) })}</span>
         {#if readers}
           <span>{t(readers.key, { bots: readers.bots })}</span>
@@ -131,7 +125,7 @@
               title={t('cfg.undoTitle')}
               onclick={() => config.undo(path)}
             >
-              <Undo2 />
+              <Glyph name="undo" class="size-3.5" />
               {t('cfg.undo')}
             </Button>
           {/if}

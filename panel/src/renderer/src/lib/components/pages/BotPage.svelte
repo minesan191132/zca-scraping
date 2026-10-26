@@ -4,7 +4,6 @@
   import * as Tabs from '$lib/components/ui/tabs'
   import * as Card from '$lib/components/ui/card'
   import BotButtons from '$lib/components/bot/BotButtons.svelte'
-  import BotIcon from '$lib/components/bot/BotIcon.svelte'
   import LogView from '$lib/components/bot/LogView.svelte'
   import StatusBadge from '$lib/components/shell/StatusBadge.svelte'
   import { botDesc, botName } from '$lib/bot-text'
@@ -32,14 +31,9 @@
 
 <div class="space-y-6">
   <div class="flex items-start gap-4">
-    <span
-      class="flex size-12 shrink-0 items-center justify-center rounded-xl bg-muted text-primary"
-    >
-      <BotIcon {id} class="size-6" />
-    </span>
     <div class="min-w-0 flex-1">
       <div class="flex items-center gap-3">
-        <h2 class="text-xl font-semibold">{botName(id)}</h2>
+        <h2 class="text-2xl font-semibold">{botName(id)}</h2>
         <StatusBadge state={shown} />
       </div>
       <p class="mt-1 max-w-3xl text-sm text-muted-foreground">{botDesc(id)}</p>
@@ -52,16 +46,16 @@
       <Tabs.Trigger value="status">{t('tab.status')}</Tabs.Trigger>
       <Tabs.Trigger value="logs">
         {t('tab.logs')}
-        {#if logCount > 0}<span class="ml-1.5 rounded-full bg-muted-foreground/15 px-1.5 text-xs"
+        {#if logCount > 0}<span class="num ml-1.5 rounded-sm bg-muted-foreground/15 px-1.5 text-xs"
             >{logCount}</span
           >{/if}
       </Tabs.Trigger>
       <Tabs.Trigger value="settings">
         {t('tab.settings')}
         {#if dot.error}
-          <span class="ml-1.5 size-2 rounded-full bg-red-500" title={t('save.dirtyDot')}></span>
+          <span class="ml-1.5 text-xs text-dead">{t('side.invalid')}</span>
         {:else if dot.dirty}
-          <span class="ml-1.5 size-2 rounded-full bg-amber-500" title={t('save.dirtyDot')}></span>
+          <span class="ml-1.5 text-xs text-warn">{t('side.unsaved')}</span>
         {/if}
       </Tabs.Trigger>
     </Tabs.List>
@@ -76,7 +70,7 @@
               )}{:else if shown === 'alive' || shown === 'warn'}{t('card.outside')}{/if}
           </p>
           {#if s?.text}
-            <details class="rounded-lg border bg-muted/40 p-3 text-sm">
+            <details class="rounded-sm border bg-muted/40 p-3 text-sm">
               <summary class="cursor-pointer select-none font-medium">{t('card.details')}</summary>
               <p class="mt-2 text-xs text-muted-foreground">{t('card.rawNote')}</p>
               <pre

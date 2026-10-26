@@ -1,8 +1,6 @@
 <script lang="ts">
+  import Glyph from '$lib/components/ui/glyph/Glyph.svelte'
   import { tick } from 'svelte'
-  import Plus from '@lucide/svelte/icons/plus'
-  import Trash from '@lucide/svelte/icons/trash'
-  import User from '@lucide/svelte/icons/user'
   import { Input } from '$lib/components/ui/input'
   import { Button } from '$lib/components/ui/button'
   import { Checkbox } from '$lib/components/ui/checkbox'
@@ -54,9 +52,8 @@
 
 <div class="flex flex-col gap-3">
   {#each sets as set, i (i)}
-    <div class="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3">
+    <div class="flex flex-col gap-3 rounded-md border bg-muted/30 p-3">
       <div class="flex items-center gap-2">
-        <User class="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <Input
           id="{uid}-name-{i}"
           type="text"
@@ -77,7 +74,7 @@
           title={t('cfg.deletePerson')}
           onclick={() => remove(i)}
         >
-          <Trash />
+          <Glyph name="trash" class="size-3.5" />
         </Button>
       </div>
       <div class="grid grid-cols-[repeat(auto-fill,minmax(11rem,1fr))] gap-x-3 gap-y-2">
@@ -100,7 +97,7 @@
   {/each}
   <div>
     <Button variant="outline" size="sm" onclick={add}>
-      <Plus />
+      <Glyph name="plus" class="size-3.5" />
       {t('cfg.addPerson')}
     </Button>
   </div>
